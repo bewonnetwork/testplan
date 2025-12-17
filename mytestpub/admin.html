@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>BTX.ONE – Admin Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+    body{
+      min-height:100vh;
+      background:radial-gradient(circle at top,#020617,#020617 60%);
+      color:#e5f0ff;
+      padding:16px;
+    }
+    a{color:#38bdf8;text-decoration:none}
+    .shell{max-width:1200px;margin:0 auto;}
+
+    /* HEADER */
+    .admin-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:16px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .brand img{
+      width:46px;height:46px;border-radius:999px;
+      object-fit:cover;
+      box-shadow:0 0 24px rgba(59,130,246,.95);
+    }
+    .brand-title h1{
+      font-size:18px;
+      letter-spacing:.22em;
+      text-transform:uppercase;
+    }
+    .brand-title p{
+      font-size:11px;
+      color:#9ca3af;
+      margin-top:2px;
+    }
+    .header-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .btn-sm,
+    .btn-outline-sm{
+      border-radius:999px;
+      padding:7px 14px;
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.16em;
+      cursor:pointer;
+    }
+    .btn-sm{
+      border:none;
+      background:linear-gradient(135deg,#38bdf8,#22c55e);
+      color:#020617;
+      box-shadow:0 14px 32px rgba(56,189,248,.85);
+    }
+    .btn-outline-sm{
+      border:1px solid rgba(148,163,184,.7);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
+    }
+
+    /* MAIN CARD */
+    .card-main{
+      position:relative;
+      border-radius:26px;
+      padding:16px 16px 18px;
+      background:linear-gradient(135deg,rgba(15,23,42,.98),rgba(30,64,175,.96));
+      box-shadow:
+        0 0 0 2px rgba(56,189,248,.7),
+        0 26px 70px rgba(0,0,0,.9);
+      overflow:hidden;
+    }
+    .glow{
+      position:absolute;inset:-90px;
+      background:
+        radial-gradient(circle at 0 0,rgba(56,189,248,.25),transparent 60%),
+        radial-gradient(circle at 100% 100%,rgba(74,222,128,.25),transparent 60%);
+      opacity:.9;pointer-events:none;
+    }
+    .inner{position:relative;z-index:1;}
+
+    /* TABS */
+    .tabs{
+      display:flex;
+      gap:8px;
+      margin-bottom:10px;
+      flex-wrap:wrap;
+    }
+    .tab-btn{
+      border:none;
+      border-radius:999px;
+      padding:6px 14px;
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.16em;
+      cursor:pointer;
+      background:rgba(15,23,42,.92);
+      color:#cbd5f5;
+      border:1px solid rgba(148,163,184,.6);
+    }
+    .tab-btn.active{
+      background:linear-gradient(135deg,#38bdf8,#22c55e);
+      color:#020617;
+      box-shadow:0 10px 28px rgba(56,189,248,.9);
+      border-color:transparent;
+    }
+
+    .tab-section{display:none;margin-top:6px;}
+    .tab-section.active{display:block;}
+
+    /* TABLE */
+    .table-wrap{
+      border-radius:16px;
+      padding:10px;
+      background:rgba(15,23,42,.96);
+      box-shadow:0 0 0 1px rgba(148,163,184,.5);
+      font-size:11px;
+      margin-bottom:12px;
+      overflow-x:auto;
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:11px;
+      min-width:650px;
+    }
+    th,td{padding:4px 6px;text-align:left;}
+    th{
+      color:#9ca3af;
+      border-bottom:1px solid rgba(51,65,85,.8);
+      position:sticky;
+      top:0;
+      background:rgba(15,23,42,1);
+      z-index:1;
+    }
+    td{border-top:1px solid rgba(15,23,42,1);}
+    .status-pending{color:#fbbf24;}
+    .status-approved{color:#4ade80;}
+    .status-rejected{color:#f97373;}
+
+    .btn-table{
+      border-radius:999px;
+      padding:2px 8px;
+      font-size:10px;
+      border:none;
+      cursor:pointer;
+      margin-right:3px;
+    }
+    .btn-approve{
+      background:#22c55e;color:#022c22;
+    }
+    .btn-reject{
+      background:#f97373;color:#450a0a;
+    }
+    .btn-edit{
+      background:#38bdf8;color:#02101f;
+    }
+
+    /* EDIT FORM */
+    .edit-wrap{
+      border-radius:16px;
+      padding:10px 10px 8px;
+      background:rgba(15,23,42,.96);
+      box-shadow:0 0 0 1px rgba(148,163,184,.5);
+      font-size:11px;
+    }
+    .edit-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+      gap:8px;
+      margin-top:6px;
+    }
+    label{display:block;color:#e5e7eb;margin-bottom:3px;}
+    .field{
+      border-radius:999px;
+      padding:6px 10px;
+      background:rgba(15,23,42,1);
+      box-shadow:0 0 0 1px rgba(148,163,184,.7);
+    }
+    .field input,
+    .field select,
+    .field textarea{
+      width:100%;
+      border:none;
+      outline:none;
+      background:transparent;
+      color:#e5f0ff;
+      font-size:12px;
+      resize:vertical;
+    }
+    .btn-save{
+      margin-top:8px;
+      border:none;
+      border-radius:999px;
+      padding:8px 16px;
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.16em;
+      background:linear-gradient(135deg,#4ade80,#22c55e);
+      color:#022c22;
+      cursor:pointer;
+      box-shadow:0 16px 40px rgba(74,222,128,.9);
+    }
+
+    .note{
+      margin-top:6px;
+      font-size:10px;
+      color:#9ca3af;
+    }
+
+    /* USER SEARCH */
+    .user-search-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      margin-bottom:6px;
+      flex-wrap:wrap;
+    }
+    .user-search-box{
+      min-width:220px;
+      max-width:320px;
+    }
+
+    /* SETTINGS TOP ACTIONS */
+    .settings-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:8px;
+      margin-bottom:6px;
+    }
+
+    @media(max-width:640px){
+      body{padding:10px;}
+      .admin-header{flex-direction:column;align-items:flex-start;gap:8px;}
+      .user-search-row{flex-direction:column;align-items:flex-start;}
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <!-- HEADER -->
+    <header class="admin-header">
+      <div class="brand">
+        <img src="images/logo.png" alt="BTX Logo">
+        <div class="brand-title">
+          <h1>BTX.ONE</h1>
+          <p>USDT MLM • Admin Panel (LIVE)</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn-outline-sm" onclick="goDashboard()">Dashboard</button>
+        <button class="btn-outline-sm" onclick="resetDemo()">Clear Data</button>
+        <button class="btn-sm" onclick="adminLogout()">Logout</button>
+      </div>
+    </header>
+
+    <!-- MAIN -->
+    <section class="card-main">
+      <div class="glow"></div>
+      <div class="inner">
+
+        <!-- TABS -->
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="users" onclick="switchTab('users',this)">Users</button>
+          <button class="tab-btn" data-tab="deposits" onclick="switchTab('deposits',this)">Deposits</button>
+          <button class="tab-btn" data-tab="withdraws" onclick="switchTab('withdraws',this)">Withdraws</button>
+          <button class="tab-btn" data-tab="settings" onclick="switchTab('settings',this)">Settings</button>
+        </div>
+
+        <!-- USERS TAB -->
+        <section id="tab-users" class="tab-section active">
+          <div class="table-wrap">
+            <div class="user-search-row">
+              <strong>All Members (LIVE)</strong>
+              <div class="field user-search-box">
+                <input
+                  id="userSearchInput"
+                  type="text"
+                  placeholder="Search by username / email / mobile..."
+                  oninput="handleUserSearch()" />
+              </div>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Joined</th>
+                  <th>Username</th>
+                  <th>Full Name</th>
+                  <th>Email</th>
+                  <th>Mobile</th>
+                  <th>Country</th>
+                  <th>Role</th>
+                  <th>Membership</th>
+                  <th>Balance</th>
+                  <th>Team</th>
+                  <th>Ref</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="userTableBody"></tbody>
+            </table>
+          </div>
+
+          <!-- EDIT FORM -->
+          <div class="edit-wrap">
+            <strong>Edit Member (LIVE)</strong>
+            <form id="editUserForm">
+              <input type="hidden" id="editUserId" />
+
+              <div class="edit-grid">
+                <div>
+                  <label>Username</label>
+                  <div class="field">
+                    <input id="editUsername" type="text" disabled />
+                  </div>
+                </div>
+                <div>
+                  <label>Full Name</label>
+                  <div class="field">
+                    <input id="editFullName" type="text" />
+                  </div>
+                </div>
+                <div>
+                  <label>Email</label>
+                  <div class="field">
+                    <input id="editEmail" type="email" />
+                  </div>
+                </div>
+                <div>
+                  <label>Mobile</label>
+                  <div class="field">
+                    <input id="editMobile" type="text" />
+                  </div>
+                </div>
+                <div>
+                  <label>Country</label>
+                  <div class="field">
+                    <input id="editCountry" type="text" />
+                  </div>
+                </div>
+                <div>
+                  <label>Role</label>
+                  <div class="field">
+                    <select id="editRole">
+                      <option value="member">Member</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label>Membership Type</label>
+                  <div class="field">
+                    <select id="editMembership">
+                      <option value="free">Free</option>
+                      <option value="premium">Premium</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label>Balance (USDT)</label>
+                  <div class="field">
+                    <input id="editBalance" type="number" step="0.01" />
+                  </div>
+                </div>
+                <div>
+                  <label>Total Deposit</label>
+                  <div class="field">
+                    <input id="editDepositTotal" type="number" step="0.01" />
+                  </div>
+                </div>
+                <div>
+                  <label>Direct Income</label>
+                  <div class="field">
+                    <input id="editDirectIncome" type="number" step="0.01" />
+                  </div>
+                </div>
+                <div>
+                  <label>Team Income</label>
+                  <div class="field">
+                    <input id="editTeamIncome" type="number" step="0.01" />
+                  </div>
+                </div>
+                <div>
+                  <label>Team Count</label>
+                  <div class="field">
+                    <input id="editTeamCount" type="number" step="1" />
+                  </div>
+                </div>
+                <div>
+                  <label>Referral Code (raw)</label>
+                  <div class="field">
+                    <input id="editRefCode" type="text" />
+                  </div>
+                </div>
+                <div>
+                  <label>Sponsor Username</label>
+                  <div class="field">
+                    <input id="editSponsor" type="text" />
+                  </div>
+                </div>
+                <div>
+                  <label>Password (display only)</label>
+                  <div class="field">
+                    <input id="editPassword" type="text" disabled />
+                  </div>
+                </div>
+              </div>
+
+              <button type="submit" class="btn-save">Save Changes</button>
+            </form>
+            <p class="note">
+              ⚠ এখানে password শুধু দেখানোর জন্য। ভবিষ্যতে Firebase Auth করলে, password reset ইমেইল ব্যবহার করতে হবে।
+            </p>
+          </div>
+        </section>
+
+        <!-- DEPOSITS TAB -->
+        <section id="tab-deposits" class="tab-section">
+          <div class="table-wrap">
+            <strong>All Deposit Requests (LIVE)</strong>
+            <table>
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>User</th>
+                  <th>Amount</th>
+                  <th>Method</th>
+                  <th>Txn</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="depAdminBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- WITHDRAWS TAB -->
+        <section id="tab-withdraws" class="tab-section">
+          <div class="table-wrap">
+            <strong>All Withdraw Requests (LIVE)</strong>
+            <table>
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>User</th>
+                  <th>Amount</th>
+                  <th>Method</th>
+                  <th>Wallet</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="wdAdminBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- SETTINGS TAB (GLOBAL CONTROL USER PANEL + ROI + GLOBAL POOL) -->
+        <section id="tab-settings" class="tab-section">
+          <div class="edit-wrap">
+            <strong>Global Settings (User Panel Text / Info)</strong>
+
+            <!-- TOP ACTION BUTTONS: ROI + GLOBAL POOL -->
+            <div class="settings-actions">
+              <!-- Daily ROI -->
+              <button type="button"
+                      class="btn-save"
+                      onclick="runROIForAll()">
+                Run Daily ROI
+              </button>
+
+              <!-- Refresh Global Pool summary -->
+              <button type="button"
+                      class="btn-save"
+                      style="background:linear-gradient(135deg,#38bdf8,#22c55e);color:#020617;"
+                      onclick="refreshGlobalSummary()">
+                Refresh Global Pool
+              </button>
+
+              <!-- Open Global & Gift Panel page -->
+              <button type="button"
+                      class="btn-save"
+                      style="background:linear-gradient(135deg,#0ea5e9,#a855f7);color:#020617;"
+                      onclick="window.location.href='admin-global.html'">
+                Global & Gift Panel
+              </button>
+              <button type="button"
+                 class="btn-save"
+                  style="background:linear-gradient(135deg,#6366f1,#a855f7);color:#e5e7eb;"
+                  onclick="runRankEngineForAll()">
+                   Run Rank Bonus
+              </button>
+
+              <!-- Distribute Global bonus to users -->
+              <button type="button"
+                      class="btn-save"
+                      style="background:linear-gradient(135deg,#f97316,#ec4899);color:#111827;"
+                      onclick="distributeGlobalBonus()">
+                Distribute Global Bonus
+              </button>
+            </div>
+
+            <p id="globalStatus" class="note"></p>
+            <div id="globalPoolBox" class="note"></div>
+
+            <!-- SETTINGS FORM -->
+            <form id="settingsForm">
+              <div class="edit-grid">
+                <!-- BASIC TEXTS -->
+                <div>
+                  <label>Site Title</label>
+                  <div class="field">
+                    <input id="setSiteTitle" type="text" placeholder="BTX.ONE" />
+                  </div>
+                </div>
+                <div>
+                  <label>Dashboard Title</label>
+                  <div class="field">
+                    <input id="setDashTitle" type="text" placeholder="USDT MLM • Member Dashboard" />
+                  </div>
+                </div>
+                <div>
+                  <label>Scrolling / Notice Text</label>
+                  <div class="field">
+                    <input id="setScalpText" type="text" placeholder="Short scalping notice text..." />
+                  </div>
+                </div>
+                <div>
+                  <label>ROI Note</label>
+                  <div class="field">
+                    <input id="setRoiNote" type="text" placeholder="ROI will be credited daily at server time..." />
+                  </div>
+                </div>
+                <div>
+                  <label>Withdraw Note</label>
+                  <div class="field">
+                    <input id="setWithdrawNote" type="text" placeholder="Minimum withdraw, rules etc..." />
+                  </div>
+                </div>
+                <div>
+                  <label>Support Email</label>
+                  <div class="field">
+                    <input id="setSupportEmail" type="email" placeholder="support@btx.one" />
+                  </div>
+                </div>
+                <div>
+                  <label>Telegram Link</label>
+                  <div class="field">
+                    <input id="setTelegramLink" type="text" placeholder="https://t.me/yourgroup" />
+                  </div>
+                </div>
+
+                <!-- MARKETING PLAN -->
+                <div>
+                  <label>Marketing Plan Title</label>
+                  <div class="field">
+                    <input id="setMarketingTitle" type="text" placeholder="BTX.ONE Marketing Plan" />
+                  </div>
+                </div>
+                <div>
+                  <label>Marketing Plan Text (short)</label>
+                  <div class="field">
+                    <input id="setMarketingText" type="text" placeholder="Short description of your marketing plan..." />
+                  </div>
+                </div>
+                <div>
+                  <label>Marketing Plan Link (PDF / page)</label>
+                  <div class="field">
+                    <input id="setMarketingLink" type="text" placeholder="https://btx.one/marketing.pdf" />
+                  </div>
+                </div>
+
+                <!-- MENU ITEMS FOR 3-DOT MENU -->
+                <div>
+                  <label>Menu 1 Label</label>
+                  <div class="field">
+                    <input id="setMenu1Label" type="text" placeholder="Profile" />
+                  </div>
+                </div>
+                <div>
+                  <label>Menu 1 URL</label>
+                  <div class="field">
+                    <input id="setMenu1Url" type="text" placeholder="profile.html" />
+                  </div>
+                </div>
+                <div>
+                  <label>Menu 2 Label</label>
+                  <div class="field">
+                    <input id="setMenu2Label" type="text" placeholder="Packages" />
+                  </div>
+                </div>
+                <div>
+                  <label>Menu 2 URL</label>
+                  <div class="field">
+                    <input id="setMenu2Url" type="text" placeholder="packages.html" />
+                  </div>
+                </div>
+                <div>
+                  <label>Menu 3 Label</label>
+                  <div class="field">
+                    <input id="setMenu3Label" type="text" placeholder="Income Report" />
+                  </div>
+                </div>
+                <div>
+                  <label>Menu 3 URL</label>
+                  <div class="field">
+                    <input id="setMenu3Url" type="text" placeholder="income-history.html" />
+                  </div>
+                </div>
+              </div>
+
+              <button type="submit" class="btn-save">Save Settings</button>
+            </form>
+
+            <p class="note">
+              These settings are read from Firestore: <code>config/global</code>. Member dashboard and user panel
+              will use these texts, menu items and marketing plan automatically.
+            </p>
+          </div>
+        </section>
+      </div>
+    </section>
+  </div>
+
+  <!-- Firebase config -->
+  <script type="module" src="firebase-config.js"></script>
+
+  <!-- Admin panel logic -->
+  <script type="module" src="admin.js"></script>
+
+  <!-- ROI engine – runROIForAll() -->
+  <script type="module" src="roi-engine.js"></script>
+
+  <!-- Global sales bonus logic – refreshGlobalSummary() + distributeGlobalBonus() -->
+  <script type="module" src="global-bonus.js"></script>
+  <script type="module" src="rank-engine.js"></script>
+</body>
+</html>

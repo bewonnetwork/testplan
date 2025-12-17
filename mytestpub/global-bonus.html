@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>BTX.ONE – Global & Gift Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+    body{
+      min-height:100vh;
+      background:radial-gradient(circle at top,#020617,#020617 60%);
+      color:#e5f0ff;
+      padding:16px;
+    }
+    a{color:#38bdf8;text-decoration:none}
+    .shell{max-width:900px;margin:0 auto;}
+
+    .head-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:14px;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .brand img{
+      width:42px;height:42px;border-radius:999px;
+      object-fit:cover;
+      box-shadow:0 0 22px rgba(59,130,246,.95);
+    }
+    .brand-title h1{
+      font-size:18px;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+    }
+    .brand-title p{
+      font-size:11px;
+      color:#9ca3af;
+      margin-top:2px;
+    }
+    .btn-small{
+      border-radius:999px;
+      padding:7px 14px;
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.16em;
+      cursor:pointer;
+      border:1px solid rgba(148,163,184,.7);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
+    }
+    .btn-main{
+      border:none;
+      background:linear-gradient(135deg,#38bdf8,#22c55e);
+      color:#020617;
+      box-shadow:0 14px 32px rgba(56,189,248,.85);
+    }
+
+    .card{
+      border-radius:24px;
+      padding:14px 14px 16px;
+      background:linear-gradient(135deg,rgba(15,23,42,.98),rgba(30,64,175,.96));
+      box-shadow:
+        0 0 0 2px rgba(56,189,248,.7),
+        0 26px 70px rgba(0,0,0,.9);
+      margin-bottom:12px;
+    }
+    .section-title{
+      font-size:15px;
+      text-transform:uppercase;
+      letter-spacing:.18em;
+      margin-bottom:8px;
+    }
+
+    .box{
+      border-radius:18px;
+      padding:12px 12px 10px;
+      background:rgba(15,23,42,.96);
+      box-shadow:0 0 0 1px rgba(148,163,184,.5);
+      margin-bottom:10px;
+    }
+
+    .row{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:4px;
+      font-size:12px;
+    }
+    .row span.label{color:#9ca3af;}
+
+    .field{
+      border-radius:999px;
+      padding:6px 10px;
+      background:rgba(15,23,42,1);
+      box-shadow:0 0 0 1px rgba(148,163,184,.7);
+      margin-top:4px;
+      margin-bottom:6px;
+    }
+    .field input{
+      width:100%;
+      border:none;
+      outline:none;
+      background:transparent;
+      color:#e5f0ff;
+      font-size:12px;
+    }
+    .field textarea{
+      width:100%;
+      border:none;
+      outline:none;
+      background:transparent;
+      color:#e5f0ff;
+      font-size:12px;
+      resize:vertical;
+    }
+
+    .btn-action{
+      border:none;
+      border-radius:999px;
+      padding:8px 16px;
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.16em;
+      cursor:pointer;
+      margin-right:6px;
+      margin-top:4px;
+    }
+    .btn-green{
+      background:linear-gradient(135deg,#4ade80,#22c55e);
+      color:#022c22;
+      box-shadow:0 14px 32px rgba(74,222,128,.9);
+    }
+    .btn-blue{
+      background:linear-gradient(135deg,#38bdf8,#22c55e);
+      color:#020617;
+      box-shadow:0 14px 32px rgba(56,189,248,.9);
+    }
+    .btn-pink{
+      background:linear-gradient(135deg,#f97316,#ec4899);
+      color:#111827;
+      box-shadow:0 14px 32px rgba(244,114,182,.9);
+    }
+
+    .note{
+      margin-top:6px;
+      font-size:11px;
+      color:#9ca3af;
+    }
+
+    @media(max-width:640px){
+      body{padding:10px;}
+      .row{flex-direction:column;align-items:flex-start;}
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="head-row">
+      <div class="brand">
+        <img src="images/logo.png" alt="BTX Logo" />
+        <div class="brand-title">
+          <h1>BTX.ONE</h1>
+          <p>GLOBAL & GIFT PANEL</p>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn-small" onclick="window.location.href='admin.html'">← Back to Admin</button>
+        <button class="btn-small btn-main" onclick="adminLogout()">Logout</button>
+      </div>
+    </header>
+
+    <section class="card">
+      <h2 class="section-title">GLOBAL SALES BONUS</h2>
+
+      <div class="box" id="globalPoolBox">
+        <div class="row">
+          <span class="label">Auto Total Sales (system):</span>
+          <span id="lblAutoSales">$0.00</span>
+        </div>
+        <div class="row">
+          <span class="label">Manual Extra (admin add):</span>
+          <span id="lblManualExtra">$0.00</span>
+        </div>
+        <div class="row">
+          <span class="label">Effective Total Sales (auto + manual):</span>
+          <span id="lblEffectiveSales">$0.00</span>
+        </div>
+        <div class="row">
+          <span class="label">Last Global Run Info:</span>
+          <span id="lblLastInfo">No run yet.</span>
+        </div>
+
+        <div class="field">
+          <input id="totalOverride" type="number" step="0.01"
+                 placeholder="Total Sales Override (optional) – leave blank = effective sales" />
+        </div>
+
+        <div class="row">
+          <span class="label">Pool A (% for 500–999):</span>
+          <span>
+            <div class="field">
+              <input id="poolPercentA" type="number" step="0.1" value="3" />
+            </div>
+          </span>
+        </div>
+        <div class="row">
+          <span class="label">Pool B (% for 1000+):</span>
+          <span>
+            <div class="field">
+              <input id="poolPercentB" type="number" step="0.1" value="2" />
+            </div>
+          </span>
+        </div>
+
+        <button class="btn-action btn-green" onclick="refreshGlobalSummary()">
+          Refresh Auto Sales
+        </button>
+        <button class="btn-action btn-blue" onclick="distributeGlobalBonus()">
+          Distribute Global Bonus
+        </button>
+
+        <p class="note" id="globalStatus">No pool found. No global sales yet.</p>
+        <p class="note">
+          • Auto Total Sales সাধারণত system / অন্য engine থেকে জমা হবে (deposit approve, package ইত্যাদি)।<br/>
+          • Admin চাইলে Manual Extra লাইন দিয়ে যেকোনো extra sales add করতে পারে – effective total sales বাড়বে।<br/>
+          • Override বক্সে মান লিখলে, সেই মান অনুযায়ী pool হিসাব হবে (cap রাখা যাবে)।<br/>
+        </p>
+      </div>
+
+      <h2 class="section-title" style="margin-top:12px;">GIFT VOUCHER (MANUAL)</h2>
+
+      <div class="box">
+        <div class="field">
+          <input id="giftUser" type="text" placeholder="Username (receiver) – premium ID only" />
+        </div>
+        <div class="field">
+          <input id="giftAmount" type="number" step="0.01" placeholder="Gift Amount (USDT)" />
+        </div>
+        <div class="field">
+          <textarea id="giftNote" rows="2" placeholder="Remark / Note (optional) – promo, reward, etc."></textarea>
+        </div>
+
+        <button class="btn-action btn-pink" onclick="sendGiftVoucher()">
+          Send Gift
+        </button>
+
+        <p class="note" id="giftStatus">• শুধু Premium ID গিফট পাবে।</p>
+        <p class="note">
+          • গিফট গেলে Gift Voucher + Current Earning + Total Earning একসাথে আপডেট হবে।<br/>
+          • একই সাথে <code>income_history</code> collection এ লগ থাকবে (type: <code>gift</code>)।<br/>
+        </p>
+      </div>
+    </section>
+  </div>
+
+  <!-- শুধু একটাই JS ফাইল – এর ভেতরেই firebase-config import হবে -->
+  <script type="module" src="admin-global.js"></script>
+  <script type="module" src="income-control.js"></script>
+
+</body>
+</html>

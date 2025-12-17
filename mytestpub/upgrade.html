@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>BTX.ONE – Upgrade / Invest</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+    body{
+      min-height:100vh;
+      background:radial-gradient(circle at top,#020617,#020617 60%);
+      color:#e5f0ff;
+      padding:16px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .shell{width:100%;max-width:480px;}
+    .card{
+      border-radius:26px;
+      padding:18px 18px 20px;
+      background:linear-gradient(135deg,rgba(15,23,42,.98),rgba(30,64,175,.96));
+      box-shadow:
+        0 0 0 2px rgba(56,189,248,.7),
+        0 26px 70px rgba(0,0,0,.9);
+      position:relative;
+      overflow:hidden;
+    }
+    .glow{
+      position:absolute;inset:-90px;
+      background:
+        radial-gradient(circle at 0 0,rgba(56,189,248,.25),transparent 60%),
+        radial-gradient(circle at 100% 100%,rgba(74,222,128,.25),transparent 60%);
+      opacity:.9;pointer-events:none;
+    }
+    .inner{position:relative;z-index:1;}
+
+    h1{
+      font-size:20px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      margin-bottom:4px;
+    }
+    p.sub{
+      font-size:12px;
+      color:#9ca3af;
+      margin-bottom:10px;
+    }
+
+    .info-box{
+      border-radius:16px;
+      padding:10px 11px;
+      background:rgba(15,23,42,.96);
+      box-shadow:0 0 0 1px rgba(148,163,184,.5);
+      font-size:12px;
+      margin-bottom:10px;
+    }
+    .info-row{
+      display:flex;
+      justify-content:space-between;
+      margin-bottom:2px;
+    }
+    .info-row span:first-child{color:#9ca3af;}
+
+    .field{
+      margin-top:6px;
+      border-radius:16px;
+      padding:10px 11px;
+      background:rgba(15,23,42,.96);
+      box-shadow:0 0 0 1px rgba(148,163,184,.5);
+      font-size:12px;
+    }
+    .field label{
+      display:block;
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      color:#9ca3af;
+      margin-bottom:4px;
+    }
+    .field input{
+      width:100%;
+      margin-top:2px;
+      padding:7px 9px;
+      border-radius:999px;
+      border:none;
+      outline:none;
+      background:#020617;
+      color:#e5f0ff;
+      font-size:13px;
+      box-shadow:0 0 0 1px rgba(51,65,85,.9) inset;
+    }
+
+    .btn{
+      width:100%;
+      margin-top:10px;
+      border:none;
+      border-radius:999px;
+      padding:9px 16px;
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.16em;
+      cursor:pointer;
+      background:linear-gradient(135deg,#38bdf8,#22c55e);
+      color:#020617;
+      box-shadow:0 16px 34px rgba(56,189,248,.9);
+    }
+    .btn-secondary{
+      margin-top:6px;
+      border-radius:999px;
+      padding:7px 12px;
+      font-size:11px;
+      border:1px solid rgba(148,163,184,.7);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
+      width:100%;
+      cursor:pointer;
+    }
+
+    .note{
+      margin-top:6px;
+      font-size:10px;
+      color:#9ca3af;
+      line-height:1.4;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="card">
+      <div class="glow"></div>
+      <div class="inner">
+        <h1>UPGRADE / INVEST</h1>
+        <p class="sub">
+          Deposit approve হওয়ার পর যে balance আছে, এখান থেকে package / investment করলেই
+          আপনি Free থেকে Premium member হবেন। Sponsor direct 5% (বা plan sponsor %) পাবে।
+        </p>
+
+        <!-- USER SNAPSHOT -->
+        <div class="info-box">
+          <div class="info-row">
+            <span>Username</span>
+            <span id="uUsername">-</span>
+          </div>
+          <div class="info-row">
+            <span>Membership</span>
+            <span id="uMembership">-</span>
+          </div>
+          <div class="info-row">
+            <span>Add Balance (wallet)</span>
+            <span id="uBalance">$0.00</span>
+          </div>
+          <div class="info-row">
+            <span>Total Self Investment</span>
+            <span id="uDepositTotal">$0.00</span>
+          </div>
+        </div>
+
+        <!-- AMOUNT FIELD -->
+        <div class="field">
+          <label for="invAmount">Investment Amount (USDT)</label>
+          <input id="invAmount" type="number" step="0.01" placeholder="10" />
+        </div>
+
+        <button class="btn" onclick="submitUpgrade()">Invest / Upgrade Now</button>
+        <button class="btn-secondary" onclick="window.location.href='dashboard.html'">
+          ← Back to Dashboard
+        </button>
+
+        <p class="note">
+          🔹 Minimum invest example: 10 USDT (তুমি চাইলে পরে change করতে পারবে)।<br/>
+          🔹 Invest সফল হলে: Add Balance থেকে amount কাটা হবে, Self Deposit বাড়বে, Membership → Premium হবে।<br/>
+          🔹 Sponsor শুধুমাত্র এই invest এর উপর ৫% (বা plan sponsor %) direct income পাবে – শুধু ১ জন sponsor।
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="upgrade.js"></script>
+  <script type="module" src="income-control.js"></script>
+
+</body>
+</html>

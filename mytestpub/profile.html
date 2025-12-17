@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>BTX.ONE – My Profile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+    body{
+      min-height:100vh;
+      background:radial-gradient(circle at top,#020617,#020617 60%);
+      color:#e5f0ff;
+      padding:16px;
+    }
+    a{color:#38bdf8;text-decoration:none}
+    .shell{max-width:900px;margin:0 auto;}
+
+    .page-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:14px;
+    }
+    .page-header h1{
+      font-size:20px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+    }
+    .btn{
+      border:none;
+      border-radius:999px;
+      padding:7px 14px;
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      cursor:pointer;
+      background:linear-gradient(135deg,#38bdf8,#22c55e);
+      color:#020617;
+      box-shadow:0 14px 32px rgba(56,189,248,.85);
+    }
+    .btn-ghost{
+      border-radius:999px;
+      padding:6px 12px;
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      border:1px solid rgba(148,163,184,.7);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
+      cursor:pointer;
+    }
+
+    .card{
+      border-radius:22px;
+      padding:14px 16px;
+      margin-bottom:12px;
+      background:linear-gradient(135deg,rgba(15,23,42,.98),rgba(30,64,175,.9));
+      box-shadow:
+        0 0 0 1px rgba(56,189,248,.5),
+        0 20px 50px rgba(0,0,0,.9);
+    }
+
+    .profile-top{
+      display:flex;
+      gap:16px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+    }
+    .avatar-wrap{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:6px;
+    }
+    .avatar{
+      width:90px;height:90px;
+      border-radius:999px;
+      background:radial-gradient(circle at 30% 20%,#38bdf8,#0f172a);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:32px;
+      color:#e5f0ff;
+      box-shadow:0 0 0 2px rgba(56,189,248,.8),
+                 0 18px 40px rgba(15,23,42,1);
+      overflow:hidden;
+    }
+    .avatar img{
+      width:100%;height:100%;object-fit:cover;
+    }
+    .avatar small{font-size:10px;color:#9ca3af;}
+
+    .profile-main{
+      flex:1;
+      min-width:220px;
+    }
+    .profile-main h2{font-size:18px;margin-bottom:4px;}
+    .tag-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px;}
+    .tag{
+      font-size:10px;
+      border-radius:999px;
+      padding:3px 8px;
+      border:1px solid rgba(148,163,184,.7);
+      background:rgba(15,23,42,.8);
+      color:#cbd5f5;
+    }
+    .profile-main p{font-size:12px;color:#cbd5f5;}
+
+    .two-col{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+      gap:10px;
+      margin-top:10px;
+    }
+    .info-row{
+      display:flex;
+      justify-content:space-between;
+      font-size:12px;
+      margin-bottom:3px;
+    }
+    .info-row span:first-child{color:#9ca3af;}
+
+    .section-title{
+      font-size:14px;
+      margin-bottom:6px;
+    }
+
+    .form-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+      gap:8px;
+    }
+    .field{
+      display:flex;
+      flex-direction:column;
+      font-size:12px;
+      gap:2px;
+    }
+    .field label{color:#9ca3af;}
+    .field input,
+    .field select{
+      border-radius:999px;
+      border:none;
+      outline:none;
+      padding:7px 10px;
+      background:rgba(15,23,42,1);
+      color:#e5f0ff;
+      box-shadow:0 0 0 1px rgba(148,163,184,.8);
+    }
+
+    .note{
+      font-size:11px;
+      color:#9ca3af;
+      margin-top:6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="page-header">
+      <div>
+        <h1>MY PROFILE</h1>
+        <p style="font-size:11px;color:#9ca3af;margin-top:2px;">
+          View and update your personal information, wallets and security settings.
+        </p>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="btn-ghost" onclick="goDashboard()">Dashboard</button>
+        <button class="btn" onclick="logout()">Logout</button>
+      </div>
+    </header>
+
+    <!-- PROFILE OVERVIEW -->
+    <section class="card">
+      <div class="profile-top">
+        <div class="avatar-wrap">
+          <div class="avatar" id="avatarBox">
+            <span id="avatarInitial">U</span>
+          </div>
+          <label class="btn-ghost" style="font-size:10px;padding:4px 10px;cursor:pointer;">
+            Change Photo
+            <input type="file" id="avatarInput" accept="image/*" style="display:none;">
+          </label>
+        </div>
+
+        <div class="profile-main">
+          <h2 id="profName">Member Name</h2>
+          <div class="tag-row">
+            <span class="tag" id="profUsername">@user</span>
+            <span class="tag" id="profRole">Member</span>
+            <span class="tag" id="profRank">Rank: None</span>
+          </div>
+          <p id="profEmail">Email: -</p>
+          <p id="profCountry">Country: -</p>
+          <p id="profJoined">Joined: -</p>
+        </div>
+      </div>
+
+      <div class="two-col" style="margin-top:12px;">
+        <div>
+          <div class="section-title">Wallet Overview</div>
+          <div class="info-row"><span>Add Balance</span><span id="wAdd">$0.00</span></div>
+          <div class="info-row"><span>Earning Wallet</span><span id="wEarn">$0.00</span></div>
+          <div class="info-row"><span>Voucher Wallet</span><span id="wVoucher">$0.00</span></div>
+          <div class="info-row"><span>Total Earning</span><span id="wTotal">$0.00</span></div>
+        </div>
+        <div>
+          <div class="section-title">Investment Overview</div>
+          <div class="info-row"><span>Self Investment</span><span id="invSelf">$0.00</span></div>
+          <div class="info-row"><span>Team Investment</span><span id="invTeam">$0.00</span></div>
+          <div class="info-row"><span>3× Max Return</span><span id="invMax">$0.00</span></div>
+          <div class="info-row"><span>3× Remaining</span><span id="invRemain">$0.00</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PERSONAL INFO UPDATE -->
+    <section class="card">
+      <div class="section-title">Personal Details</div>
+      <div class="form-grid">
+        <div class="field">
+          <label for="fullNameInput">Full Name</label>
+          <input id="fullNameInput" />
+        </div>
+        <div class="field">
+          <label for="mobileInput">Mobile</label>
+          <input id="mobileInput" />
+        </div>
+        <div class="field">
+          <label for="countryInput">Country</label>
+          <input id="countryInput" />
+        </div>
+      </div>
+      <button class="btn" style="margin-top:10px;" onclick="savePersonal()">
+        Save Personal Info
+      </button>
+      <p class="note">These changes update only your local demo data. In real system, this will be saved to the server.</p>
+    </section>
+
+    <!-- SECURITY -->
+    <section class="card">
+      <div class="section-title">Security – Change Password</div>
+      <div class="form-grid">
+        <div class="field">
+          <label for="oldPassInput">Old Password</label>
+          <input id="oldPassInput" type="password" />
+        </div>
+        <div class="field">
+          <label for="newPassInput">New Password</label>
+          <input id="newPassInput" type="password" />
+        </div>
+        <div class="field">
+          <label for="newPass2Input">Confirm New Password</label>
+          <input id="newPass2Input" type="password" />
+        </div>
+      </div>
+      <button class="btn" style="margin-top:10px;" onclick="changePassword()">
+        Update Password
+      </button>
+      <p class="note">Demo only – password stored in browser localStorage.</p>
+    </section>
+
+  </div>
+
+  <script>
+    const STORAGE_CURRENT = "btx_current_user_v1";
+    const STORAGE_USERS   = "btx_users_v1";
+
+    function fmt(v){ return "$" + (Number(v||0)).toFixed(2); }
+
+    function getCurrentUser(){
+      const raw = localStorage.getItem(STORAGE_CURRENT);
+      if(!raw) return null;
+      try{return JSON.parse(raw);}catch(e){return null;}
+    }
+    function loadUsers(){
+      const raw = localStorage.getItem(STORAGE_USERS);
+      if(!raw) return [];
+      try{return JSON.parse(raw);}catch(e){return [];}
+    }
+    function saveUsers(list){
+      localStorage.setItem(STORAGE_USERS, JSON.stringify(list||[]));
+    }
+    function findUser(username, users){
+      const uName = (username||"").toLowerCase();
+      return users.find(u => (u.username||"").toLowerCase() === uName) || null;
+    }
+
+    function logout(){
+      localStorage.removeItem(STORAGE_CURRENT);
+      alert("Logged out (demo).");
+      window.location.href = "login.html";
+    }
+    function goDashboard(){
+      window.location.href = "dashboard.html";
+    }
+
+    // ----------- INIT PROFILE -----------
+    (function init(){
+      const cur = getCurrentUser();
+      if(!cur){
+        window.location.href = "login.html";
+        return;
+      }
+      const users = loadUsers();
+      const u = findUser(cur.username, users) || cur;
+
+      // avatar
+      const avatarBox  = document.getElementById("avatarBox");
+      const avatarInit = document.getElementById("avatarInitial");
+      if(u.avatarData){
+        avatarBox.innerHTML = '<img src="'+u.avatarData+'" alt="avatar">';
+      }else{
+        const name = u.fullName || u.username || "U";
+        avatarInit.textContent = name.charAt(0).toUpperCase();
+      }
+
+      document.getElementById("profName").textContent     = u.fullName || u.username || "Member";
+      document.getElementById("profUsername").textContent = "@"+(u.username||"user");
+      document.getElementById("profRole").textContent     = (u.role==="admin"?"Admin":"Member");
+      document.getElementById("profRank").textContent     = "Rank: " + (u.rankName || "None");
+      document.getElementById("profEmail").textContent    = "Email: " + (u.email || "-");
+      document.getElementById("profCountry").textContent  = "Country: " + (u.country || "-");
+      if(u.createdAt){
+        try{
+          const d = new Date(u.createdAt);
+          document.getElementById("profJoined").textContent = "Joined: " + d.toLocaleString();
+        }catch(e){
+          document.getElementById("profJoined").textContent = "Joined: -";
+        }
+      }
+
+      // wallets
+      document.getElementById("wAdd").textContent     = fmt(u.addBalance       || 0);
+      document.getElementById("wEarn").textContent    = fmt(u.earningBalance   || 0);
+      document.getElementById("wVoucher").textContent = fmt(u.voucherBalance   || 0);
+      const total = (u.directIncome||0)+(u.teamIncome||0)+(u.rankIncome||0)+(u.globalIncome||0)+(u.giftVoucherIncome||0)+(u.roiEarned||0);
+      document.getElementById("wTotal").textContent   = fmt(total);
+
+      // investment
+      const selfInv = Number(u.depositTotal   || 0);
+      const teamInv = Number(u.teamInvestment || 0);
+      const max3x   = selfInv * 3;
+      const used3x  = total;
+      const remain3x= Math.max(0,max3x-used3x);
+
+      document.getElementById("invSelf").textContent   = fmt(selfInv);
+      document.getElementById("invTeam").textContent   = fmt(teamInv);
+      document.getElementById("invMax").textContent    = fmt(max3x);
+      document.getElementById("invRemain").textContent = fmt(remain3x);
+
+      // form defaults
+      document.getElementById("fullNameInput").value = u.fullName || "";
+      document.getElementById("mobileInput").value   = u.mobile   || "";
+      document.getElementById("countryInput").value  = u.country  || "";
+
+      // avatar upload
+      const avatarInput = document.getElementById("avatarInput");
+      avatarInput.addEventListener("change", function(ev){
+        const file = ev.target.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e){
+          const dataUrl = e.target.result;
+          avatarBox.innerHTML = '<img src="'+dataUrl+'" alt="avatar">';
+          const us = loadUsers();
+          const me = findUser(cur.username, us);
+          if(me){
+            me.avatarData = dataUrl;
+            saveUsers(us);
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+    })();
+
+    // ----------- SAVE PERSONAL -----------
+    function savePersonal(){
+      const cur = getCurrentUser();
+      if(!cur){return;}
+      const users = loadUsers();
+      const u = findUser(cur.username, users);
+      if(!u){return;}
+
+      u.fullName = document.getElementById("fullNameInput").value.trim();
+      u.mobile   = document.getElementById("mobileInput").value.trim();
+      u.country  = document.getElementById("countryInput").value.trim();
+
+      saveUsers(users);
+      alert("✅ Personal info updated (demo). Reload profile to see changes.");
+      location.reload();
+    }
+
+    // ----------- CHANGE PASSWORD -----------
+    function changePassword(){
+      const cur = getCurrentUser();
+      if(!cur){return;}
+      const users = loadUsers();
+      const u = findUser(cur.username, users);
+      if(!u){return;}
+
+      const oldP = document.getElementById("oldPassInput").value;
+      const newP = document.getElementById("newPassInput").value;
+      const new2 = document.getElementById("newPass2Input").value;
+
+      if(!oldP || !newP || !new2){
+        alert("Please fill all password fields.");
+        return;
+      }
+      if(newP !== new2){
+        alert("New password and confirm do not match.");
+        return;
+      }
+      if(u.password && u.password !== oldP){
+        alert("Old password is incorrect (demo check).");
+        return;
+      }
+      u.password = newP;
+      saveUsers(users);
+      alert("🔐 Password changed (demo).");
+      document.getElementById("oldPassInput").value = "";
+      document.getElementById("newPassInput").value = "";
+      document.getElementById("newPass2Input").value = "";
+    }
+  </script>
+</body>
+</html>

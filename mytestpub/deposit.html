@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Deposit – BTX.ONE</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body{
+      background:#020617;
+      color:#e2e8f0;
+      font-family:system-ui;
+      padding:20px;
+    }
+    .box{
+      max-width:420px;
+      margin:auto;
+      background:#0f172a;
+      padding:20px;
+      border-radius:16px;
+      box-shadow:0 0 0 1px #334155;
+    }
+    .title{
+      text-align:center;
+      font-size:22px;
+      margin-bottom:18px;
+      font-weight:700;
+    }
+    label{
+      font-size:13px;
+      margin-bottom:4px;
+      display:block;
+    }
+    input,select{
+      width:100%;
+      padding:10px;
+      background:#1e293b;
+      border:1px solid #334155;
+      border-radius:10px;
+      color:#fff;
+      margin-bottom:12px;
+      font-size:14px;
+      outline:none;
+    }
+    button{
+      width:100%;
+      padding:12px;
+      background:linear-gradient(135deg,#38bdf8,#22c55e);
+      border:none;
+      border-radius:12px;
+      font-weight:bold;
+      color:#0f172a;
+      cursor:pointer;
+      margin-top:10px;
+    }
+    .qr-box{
+      text-align:center;
+      margin-bottom:16px;
+    }
+    .qr-box img{
+      width:160px;
+      height:160px;
+      object-fit:cover;
+      border-radius:24px;
+      box-shadow:0 0 25px rgba(56,189,248,.8);
+      margin-bottom:10px;
+    }
+    .wallet-row{
+      display:flex;
+      gap:6px;
+      margin-bottom:16px;
+    }
+    .wallet-row input{
+      flex:1;
+      margin-bottom:0;
+    }
+    .wallet-row button{
+      width:auto;
+      padding:10px 14px;
+      margin-top:0;
+      font-size:12px;
+    }
+    .note{
+      font-size:11px;
+      color:#94a3b8;
+      margin-bottom:12px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- পুরো ফর্মটা এখন depForm এর ভিতরে -->
+  <form id="depForm" class="box">
+    <div class="title">Add Deposit</div>
+
+    <!-- QR + Wallet address -->
+    <div class="qr-box">
+      <!-- নিজের QR image path বসাও -->
+      <img src="images/usdt-qr.png" alt="USDT QR">
+    </div>
+
+    <div class="wallet-row">
+      <!-- এখানে নিজের real USDT address বসাবে -->
+      <input id="depWalletAddr" type="text" readonly
+             value="YOUR_USDT_WALLET_ADDRESS_HERE">
+      <button type="button" id="copyAddrBtn">Copy</button>
+    </div>
+
+    <p class="note">
+      Send USDT to this wallet address, then paste your transaction hash below and submit a request.
+    </p>
+
+    <label for="depAmount">Amount (USDT)</label>
+    <input type="number" id="depAmount" placeholder="Min 5 USDT" />
+
+    <label for="depMethod">Select Method</label>
+    <select id="depMethod">
+      <option value="TRC20">USDT – TRC20</option>
+      <option value="BEP20">USDT – BEP20</option>
+    </select>
+
+    <label for="depTxn">Transaction Hash / Txn ID</label>
+    <input type="text" id="depTxn" placeholder="Paste your Txn Hash" />
+
+    <button type="submit">Submit Deposit</button>
+  </form>
+
+  <!-- শুধু একটাই module file -->
+  <script type="module" src="./deposit.js"></script>
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>BTX.ONE – Global & Gift Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+    body{
+      min-height:100vh;
+      background:radial-gradient(circle at top,#020617,#020617 60%);
+      color:#e5f0ff;
+      padding:16px;
+    }
+    a{color:#38bdf8;text-decoration:none}
+
+    .shell{max-width:900px;margin:0 auto;}
+
+    h1{
+      font-size:18px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      margin-bottom:4px;
+    }
+    p.sub{
+      font-size:11px;
+      color:#9ca3af;
+      margin-bottom:12px;
+    }
+
+    .card{
+      border-radius:22px;
+      padding:14px 16px 16px;
+      background:rgba(15,23,42,.97);
+      box-shadow:
+        0 0 0 1px rgba(148,163,184,.5),
+        0 24px 60px rgba(0,0,0,.9);
+      margin-bottom:14px;
+    }
+    .card h2{
+      font-size:14px;
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      margin-bottom:6px;
+    }
+    .row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:8px;
+      font-size:12px;
+    }
+    .field{
+      flex:1;
+      min-width:160px;
+    }
+    .field label{
+      display:block;
+      font-size:11px;
+      color:#9ca3af;
+      margin-bottom:2px;
+    }
+    .field input{
+      width:100%;
+      padding:7px 9px;
+      border-radius:999px;
+      border:none;
+      outline:none;
+      background:#020617;
+      color:#e5f0ff;
+      font-size:12px;
+      box-shadow:0 0 0 1px rgba(51,65,85,.9) inset;
+    }
+    .btn{
+      border:none;
+      border-radius:999px;
+      padding:8px 14px;
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      cursor:pointer;
+      background:linear-gradient(135deg,#38bdf8,#22c55e);
+      color:#020617;
+      box-shadow:0 16px 34px rgba(56,189,248,.9);
+      white-space:nowrap;
+    }
+    .btn-outline{
+      border-radius:999px;
+      padding:7px 12px;
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.14em;
+      border:1px solid rgba(148,163,184,.7);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+    .note{
+      font-size:11px;
+      color:#9ca3af;
+      margin-top:4px;
+      line-height:1.5;
+    }
+    .two-col{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+      gap:10px;
+    }
+    .stat-line{
+      font-size:12px;
+      margin-bottom:2px;
+    }
+    .stat-line span:first-child{color:#9ca3af;}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <h1>GLOBAL &amp; GIFT PANEL</h1>
+    <p class="sub">
+      Only admin access. এখানে থেকে Global Sales Bonus auto হিসাব + manual edit
+      এবং Premium member দের Gift Voucher পাঠানো যাবে।
+    </p>
+
+    <!-- GLOBAL SALES CARD -->
+    <section class="card">
+      <h2>Global Sales Bonus</h2>
+      <div class="stat-line">
+        <span>Auto Total Sales (system):</span>
+        <span id="autoSales">$0.00</span>
+      </div>
+      <div class="stat-line">
+        <span>Manual Extra (admin add):</span>
+        <span id="manualSales">$0.00</span>
+      </div>
+      <div class="stat-line">
+        <span>Effective Total Sales (auto + manual):</span>
+        <span id="effectiveSales">$0.00</span>
+      </div>
+      <div class="stat-line">
+        <span>Last Global Run Info:</span>
+        <span id="lastGlobalInfo">No run yet.</span>
+      </div>
+
+      <div class="row" style="margin-top:8px;">
+        <div class="field">
+          <label>Total Sales Override (optional)</label>
+          <input id="inputTotalSales" type="number" step="0.01" placeholder="leave blank = effective sales" />
+        </div>
+        <div class="field">
+          <label>Pool A (% for 500–999)</label>
+          <input id="inputPoolA" type="number" step="0.1" value="3" />
+        </div>
+        <div class="field">
+          <label>Pool B (% for 1000+)</label>
+          <input id="inputPoolB" type="number" step="0.1" value="2" />
+        </div>
+      </div>
+
+      <div class="row">
+        <button class="btn-outline" onclick="refreshCompanySales()">Refresh Auto Sales</button>
+        <button class="btn" onclick="runGlobalBonus()">Distribute Global Bonus</button>
+      </div>
+
+      <p class="note">
+        • Auto Total Sales ফিল্ডটা system / অন্য engine থেকে জমা হবে (deposit approve, package ইত্যাদি)।<br/>
+        • Admin চাইলে Manual Extra দিয়ে যেকোনো এমাউন্ট বাড়াতে পারে – এতে effective total sales বাড়বে।<br/>
+        • Override বক্সে মান লিখলে, সেই মান অনুযায়ী pool হিসাব হবে। ফাঁকা রাখলে effective sales ব্যবহার হবে।
+      </p>
+    </section>
+
+    <!-- GIFT VOUCHER CARD -->
+    <section class="card">
+      <h2>Gift Voucher (Manual)</h2>
+      <div class="two-col">
+        <div>
+          <div class="row">
+            <div class="field">
+              <label>Username (receiver)</label>
+              <input id="giftUser" placeholder="member username" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label>Gift Amount (USDT)</label>
+              <input id="giftAmount" type="number" step="0.01" placeholder="example: 10" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label>Remark / Note (optional)</label>
+              <input id="giftRemark" placeholder="promo, reward, etc." />
+            </div>
+          </div>
+          <div class="row">
+            <button class="btn" onclick="sendGiftVoucher()">Send Gift</button>
+          </div>
+        </div>
+        <div>
+          <p class="note">
+            • শুধু Premium ID এই গিফট পাবে (membershipType='premium').<br/>
+            • ইনকাম যাবে <b>Gift Voucher</b> + Current Earning + Total Earning এ (কারণ creditIncome(...,"gift") use হবে)।<br/>
+            • চাইলে পরে income_history collection এ আলাদা log যোগ করা যাবে (type:'gift').<br/>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <button class="btn-outline" onclick="goAdmin()">← Back to Admin</button>
+  </div>
+
+  <script type="module" src="./admin-global.js"></script>
+</body>
+</html>

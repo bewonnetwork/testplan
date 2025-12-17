@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>BTX.ONE – Admin PLAN & Settings</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+    body{
+      min-height:100vh;
+      background:radial-gradient(circle at top,#020617,#020617 60%);
+      color:#e5f0ff;
+      padding:16px;
+    }
+    a{color:#38bdf8;text-decoration:none}
+    .shell{max-width:1200px;margin:0 auto;}
+
+    /* HEADER */
+    .admin-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:16px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .brand img{
+      width:46px;height:46px;border-radius:999px;
+      object-fit:cover;
+      box-shadow:0 0 24px rgba(59,130,246,.95);
+    }
+    .brand-title h1{
+      font-size:18px;
+      letter-spacing:.22em;
+      text-transform:uppercase;
+    }
+    .brand-title p{
+      font-size:11px;
+      color:#9ca3af;
+      margin-top:2px;
+    }
+    .header-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .btn-sm,
+    .btn-outline-sm{
+      border-radius:999px;
+      padding:7px 14px;
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.16em;
+      cursor:pointer;
+    }
+    .btn-sm{
+      border:none;
+      background:linear-gradient(135deg,#38bdf8,#22c55e);
+      color:#020617;
+      box-shadow:0 14px 32px rgba(56,189,248,.85);
+    }
+    .btn-outline-sm{
+      border:1px solid rgba(148,163,184,.7);
+      background:rgba(15,23,42,.9);
+      color:#e5e7eb;
+    }
+
+    /* MAIN CARD */
+    .card-main{
+      position:relative;
+      border-radius:26px;
+      padding:16px 16px 18px;
+      background:linear-gradient(135deg,rgba(15,23,42,.98),rgba(30,64,175,.96));
+      box-shadow:
+        0 0 0 2px rgba(56,189,248,.7),
+        0 26px 70px rgba(0,0,0,.9);
+      overflow:hidden;
+    }
+    .glow{
+      position:absolute;inset:-90px;
+      background:
+        radial-gradient(circle at 0 0,rgba(56,189,248,.25),transparent 60%),
+        radial-gradient(circle at 100% 100%,rgba(74,222,128,.25),transparent 60%);
+      opacity:.9;pointer-events:none;
+    }
+    .inner{position:relative;z-index:1;}
+
+    /* TABS */
+    .tabs{
+      display:flex;
+      gap:8px;
+      margin-bottom:10px;
+      flex-wrap:wrap;
+    }
+    .tab-btn{
+      border:none;
+      border-radius:999px;
+      padding:6px 14px;
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.16em;
+      cursor:pointer;
+      background:rgba(15,23,42,.92);
+      color:#cbd5f5;
+      border:1px solid rgba(148,163,184,.6);
+    }
+    .tab-btn.active{
+      background:linear-gradient(135deg,#38bdf8,#22c55e);
+      color:#020617;
+      box-shadow:0 10px 28px rgba(56,189,248,.9);
+      border-color:transparent;
+    }
+
+    .tab-section{display:none;margin-top:6px;}
+    .tab-section.active{display:block;}
+
+    /* WRAPS */
+    .table-wrap,
+    .edit-wrap{
+      border-radius:16px;
+      padding:10px;
+      background:rgba(15,23,42,.96);
+      box-shadow:0 0 0 1px rgba(148,163,184,.5);
+      font-size:11px;
+      margin-bottom:12px;
+      overflow-x:auto;
+    }
+
+    .edit-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+      gap:8px;
+      margin-top:6px;
+    }
+    label{display:block;color:#e5e7eb;margin-bottom:3px;}
+    .field{
+      border-radius:999px;
+      padding:6px 10px;
+      background:rgba(15,23,42,1);
+      box-shadow:0 0 0 1px rgba(148,163,184,.7);
+    }
+    .field input,
+    .field select,
+    .field textarea{
+      width:100%;
+      border:none;
+      outline:none;
+      background:transparent;
+      color:#e5f0ff;
+      font-size:12px;
+      resize:vertical;
+    }
+    textarea{min-height:80px;border-radius:14px !important;}
+
+    .btn-save{
+      margin-top:8px;
+      border:none;
+      border-radius:999px;
+      padding:8px 16px;
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.16em;
+      background:linear-gradient(135deg,#4ade80,#22c55e);
+      color:#022c22;
+      cursor:pointer;
+      box-shadow:0 16px 40px rgba(74,222,128,.9);
+    }
+
+    .note{
+      margin-top:6px;
+      font-size:10px;
+      color:#9ca3af;
+    }
+
+    .pill{
+      display:inline-block;
+      padding:4px 9px;
+      border-radius:999px;
+      background:rgba(15,23,42,1);
+      border:1px solid rgba(148,163,184,.7);
+      font-size:10px;
+      margin:2px 4px 0 0;
+    }
+
+    @media(max-width:640px){
+      body{padding:10px;}
+      .admin-header{flex-direction:column;align-items:flex-start;gap:8px;}
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <!-- HEADER -->
+    <header class="admin-header">
+      <div class="brand">
+        <img src="images/logo.png" alt="BTX Logo">
+        <div class="brand-title">
+          <h1>BTX.ONE</h1>
+          <p>USDT MLM • Admin PLAN & Settings</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn-outline-sm" onclick="goDashboard()">Member Dashboard</button>
+        <button class="btn-outline-sm" onclick="goAdminLive()">Live Admin</button>
+        <button class="btn-sm" onclick="adminLogout()">Logout</button>
+      </div>
+    </header>
+
+    <!-- MAIN -->
+    <section class="card-main">
+      <div class="glow"></div>
+      <div class="inner">
+
+        <!-- TABS -->
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="global" onclick="switchTab('global',this)">Global Text</button>
+          <button class="tab-btn" data-tab="plan" onclick="switchTab('plan',this)">PLAN (ROI + Gen)</button>
+          <button class="tab-btn" data-tab="tools" onclick="switchTab('tools',this)">Tools</button>
+        </div>
+
+        <!-- GLOBAL SETTINGS TAB -->
+        <section id="tab-global" class="tab-section active">
+          <div class="edit-wrap">
+            <strong>Global Settings – Member Dashboard Text & Menu</strong>
+
+            <form id="settingsForm">
+              <div class="edit-grid">
+                <!-- BASIC TEXTS -->
+                <div>
+                  <label>Site Title</label>
+                  <div class="field">
+                    <input id="setSiteTitle" type="text" placeholder="BTX.ONE" />
+                  </div>
+                </div>
+                <div>
+                  <label>Dashboard Title</label>
+                  <div class="field">
+                    <input id="setDashboardTitle" type="text" placeholder="USDT MLM • Member Dashboard" />
+                  </div>
+                </div>
+                <div>
+                  <label>Scrolling / Notice Text</label>
+                  <div class="field">
+                    <input id="setScalpText" type="text" placeholder="Important notice text..." />
+                  </div>
+                </div>
+                <div>
+                  <label>ROI Note</label>
+                  <div class="field">
+                    <input id="setRoiNote" type="text" placeholder="ROI will be credited daily at server time..." />
+                  </div>
+                </div>
+                <div>
+                  <label>Withdraw Note</label>
+                  <div class="field">
+                    <input id="setWithdrawNote" type="text" placeholder="Minimum withdraw, service charge, rules..." />
+                  </div>
+                </div>
+                <div>
+                  <label>Support Email</label>
+                  <div class="field">
+                    <input id="setSupportEmail" type="email" placeholder="support@btx.one" />
+                  </div>
+                </div>
+                <div>
+                  <label>Telegram Link</label>
+                  <div class="field">
+                    <input id="setTelegramLink" type="text" placeholder="https://t.me/yourgroup" />
+                  </div>
+                </div>
+
+                <!-- MARKETING PLAN -->
+                <div>
+                  <label>Marketing Plan Title</label>
+                  <div class="field">
+                    <input id="setMarketingTitle" type="text" placeholder="BTX.ONE Marketing Plan" />
+                  </div>
+                </div>
+                <div>
+                  <label>Marketing Plan Text (short)</label>
+                  <div class="field">
+                    <textarea id="setMarketingText" placeholder="Short description of your marketing plan..."></textarea>
+                  </div>
+                </div>
+                <div>
+                  <label>Marketing Plan Link (PDF / Page)</label>
+                  <div class="field">
+                    <input id="setMarketingLink" type="text" placeholder="https://btx.one/marketing.pdf" />
+                  </div>
+                </div>
+
+                <!-- MENU ITEMS -->
+                <div>
+                  <label>Menu 1 Label</label>
+                  <div class="field">
+                    <input id="setMenu1Label" type="text" placeholder="Profile" />
+                  </div>
+                </div>
+                <div>
+                  <label>Menu 1 URL</label>
+                  <div class="field">
+                    <input id="setMenu1Url" type="text" placeholder="profile.html" />
+                  </div>
+                </div>
+                <div>
+                  <label>Menu 2 Label</label>
+                  <div class="field">
+                    <input id="setMenu2Label" type="text" placeholder="Packages" />
+                  </div>
+                </div>
+                <div>
+                  <label>Menu 2 URL</label>
+                  <div class="field">
+                    <input id="setMenu2Url" type="text" placeholder="packages.html" />
+                  </div>
+                </div>
+                <div>
+                  <label>Menu 3 Label</label>
+                  <div class="field">
+                    <input id="setMenu3Label" type="text" placeholder="Income History" />
+                  </div>
+                </div>
+                <div>
+                  <label>Menu 3 URL</label>
+                  <div class="field">
+                    <input id="setMenu3Url" type="text" placeholder="income-history.html" />
+                  </div>
+                </div>
+              </div>
+
+              <button type="submit" class="btn-save">Save Global Settings</button>
+            </form>
+
+            <p class="note">
+              এই সব ডাটা Firestore থেকে আসবে: <code>config/global</code> ডকুমেন্ট।
+              Member dashboard ও সব ইউজার পেজ এখানকার মান ব্যবহার করবে।
+            </p>
+          </div>
+        </section>
+
+        <!-- PLAN SETTINGS TAB -->
+        <section id="tab-plan" class="tab-section">
+          <div class="edit-wrap">
+            <strong>PLAN – ROI, 3× Barometer & Generation</strong>
+
+            <div class="note" id="planSummary">
+              Loading PLAN from Firestore...
+            </div>
+
+            <div class="note" style="margin-top:8px;">
+              • Daily ROI শুধু <span class="pill">Self Investment</span> উপর আসবে।<br/>
+              • 3× Barometer শুধু <span class="pill">ROI Income</span> এর উপর limit করবে।<br/>
+              • Sponsor, Generation, Rank, Global, Gift – সব ইনকাম <span class="pill">unlimited</span> (৩× cap লাগবে না)।<br/>
+              • Generation bonus পেতে total ২০ level-এ মোট <b>১৬ sponsor</b> দরকার (তোমার নোট অনুযায়ী)।
+            </div>
+
+            <button type="button"
+                    class="btn-save"
+                    style="margin-top:10px;background:linear-gradient(135deg,#38bdf8,#22c55e);color:#020617"
+                    onclick="seedPlan()">
+              Save / Update PLAN (ROI + Generation)
+            </button>
+
+            <p class="note">
+              এই বাটন চাপলে <code>config/plan</code> ডকুমেন্টে সম্পূর্ণ PLAN লেখা/আপডেট হবে
+              (ROI %, 3× cap, sponsor %, generation ২০ level ইত্যাদি)।<br/>
+              কোন manual genLevels add করার দরকার নেই।
+            </p>
+          </div>
+        </section>
+
+        <!-- TOOLS TAB (ROI RUN ইত্যাদি) -->
+        <section id="tab-tools" class="tab-section">
+          <div class="edit-wrap">
+            <strong>Admin Tools – ROI Engine</strong>
+
+            <button type="button"
+                    class="btn-save"
+                    style="margin-top:4px;background:linear-gradient(135deg,#4ade80,#22c55e);color:#022c22"
+                    onclick="runROIForAll()">
+              Run Daily ROI (TEST)
+            </button>
+
+            <p class="note" id="roiStatus">
+              ROI engine status will appear here when you run it.
+            </p>
+
+            <p class="note">
+              এই বাটন আসলে <code>roi-engine.js</code> ফাইলের <code>runDailyRoi()</code> ফাংশন কল করবে।
+              তাই এই পেজে অবশ্যই <code>roi-engine.js</code> স্ক্রিপ্ট লোড থাকতে হবে।
+            </p>
+          </div>
+        </section>
+
+      </div>
+    </section>
+  </div>
+
+  <!-- Logic -->
+  <script type="module" src="admin-plan.js"></script>
+  <!-- ROI engine (runDailyRoi → window.runDailyRoi) -->
+  <script type="module" src="roi-engine.js"></script>
+</body>
+</html>

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>BTX.ONE – Transaction History</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
+    body{
+      background:#020617;
+      color:#e5e7eb;
+      padding:16px;
+      min-height:100vh;
+    }
+    a{color:#38bdf8;text-decoration:none}
+
+    .shell{max-width:1000px;margin:0 auto;}
+
+    h1{font-size:20px;margin-bottom:10px;text-transform:uppercase;letter-spacing:.15em;}
+
+    .card{
+      background:rgba(15,23,42,.96);
+      padding:18px;
+      border-radius:18px;
+      box-shadow:0 0 0 1px rgba(56,189,248,.3),0 24px 50px rgba(0,0,0,.7);
+    }
+
+    .filter-row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+    select,input{
+      background:#0f172a;
+      color:#e5e7eb;
+      padding:8px 12px;
+      border-radius:8px;
+      border:1px solid rgba(148,163,184,.4);
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:13px;
+      margin-top:10px;
+    }
+    th,td{
+      padding:8px 6px;
+      border-bottom:1px solid rgba(51,65,85,.5);
+      white-space:nowrap;
+    }
+    th{
+      color:#9ca3af;
+      font-size:11px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+    }
+
+    .tag{
+      padding:2px 8px;
+      border-radius:20px;
+      font-size:11px;
+      border:1px solid rgba(148,163,184,.7);
+    }
+
+    .amt-plus{color:#22c55e;font-weight:bold;}
+    .amt-minus{color:#f87171;font-weight:bold;}
+  </style>
+</head>
+<body>
+
+  <div class="shell">
+    <h1>TRANSACTION HISTORY</h1>
+
+    <div class="card">
+
+      <!-- FILTERS -->
+      <div class="filter-row">
+        <select id="filterType">
+          <option value="all">All Types</option>
+          <option value="deposit">Deposit</option>
+          <option value="withdraw">Withdraw</option>
+          <option value="roi">ROI</option>
+          <option value="sponsor">Sponsor</option>
+          <option value="generation">Generation</option>
+          <option value="rank">Rank</option>
+          <option value="global">Global Bonus</option>
+          <option value="gift">Gift Voucher</option>
+        </select>
+
+        <input id="searchBox" type="text" placeholder="Search remark..." />
+
+        <button onclick="goDashboard()" 
+                style="padding:8px 14px;border:none;border-radius:8px;
+                       background:#22c55e;color:#000;font-size:12px;">Dashboard</button>
+      </div>
+
+      <!-- TABLE -->
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Date/Time</th>
+            <th>Type</th>
+            <th>Remark</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody id="txnBody">
+          <tr><td colspan="5">Loading…</td></tr>
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+
+
+  <!-- FIREBASE CONFIG -->
+  <script type="module" src="firebase-config.js"></script>
+
+  <!-- MAIN JS -->
+  <script type="module">
+    import {
+      db
+    } from "./firebase-config.js";
+
+    import {
+      collection,
+      query,
+      where,
+      orderBy,
+      getDocs
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    const STORAGE = "btx_current_user_v1";
+
+    function getUser(){
+      try{
+        const raw = localStorage.getItem(STORAGE);
+        return raw ? JSON.parse(raw) : null;
+      }catch(e){ return null; }
+    }
+
+    const me = getUser();
+    if(!me){
+      alert("Please login again.");
+      window.location.href = "login.html";
+    }
+
+    const bodyEl = document.getElementById("txnBody");
+    const typeFilter = document.getElementById("filterType");
+    const searchBox = document.getElementById("searchBox");
+
+    typeFilter.onchange = loadHistory;
+    searchBox.oninput = loadHistory;
+
+    function formatAmount(v){
+      const n = Number(v || 0);
+      const s = n.toFixed(2);
+      return (n >= 0 ? "+$"+s : "-$"+Math.abs(n).toFixed(2));
+    }
+
+    function typeTag(t){
+      return `<span class="tag">${(t||"OTHER").toUpperCase()}</span>`;
+    }
+
+    async function loadHistory(){
+      try{
+        const q = query(
+          collection(db,"income_history"),
+          where("username","==", me.username.toLowerCase()),
+          orderBy("createdAt","desc")
+        );
+
+        const snap = await getDocs(q);
+
+        if(snap.empty){
+          bodyEl.innerHTML = `<tr><td colspan="5">No transactions found.</td></tr>`;
+          return;
+        }
+
+        const rows = [];
+        let i = 1;
+
+        snap.forEach(docSnap=>{
+          const d = docSnap.data();
+
+          let t = (d.type||"other").toLowerCase();
+          let remark = d.remark || "-";
+          let amt = Number(d.amount || 0);
+
+          // TYPE FILTER
+          const sel = typeFilter.value;
+          if(sel !== "all" && t !== sel) return;
+
+          // SEARCH FILTER
+          if(searchBox.value){
+            const s = searchBox.value.toLowerCase();
+            if(!remark.toLowerCase().includes(s)) return;
+          }
+
+          const ts = d.createdAt?.toDate ? d.createdAt.toDate() : null;
+          const dateStr = ts ? ts.toLocaleString() : "-";
+
+          rows.push(`
+            <tr>
+              <td>${i++}</td>
+              <td>${dateStr}</td>
+              <td>${typeTag(t)}</td>
+              <td>${remark}</td>
+              <td class="${amt>=0?'amt-plus':'amt-minus'}">${formatAmount(amt)}</td>
+            </tr>
+          `);
+        });
+
+        if(rows.length === 0){
+          bodyEl.innerHTML = `<tr><td colspan="5">No match found.</td></tr>`;
+        } else {
+          bodyEl.innerHTML = rows.join("");
+        }
+
+      }catch(err){
+        console.error(err);
+        bodyEl.innerHTML = `<tr><td colspan="5">Error: ${err.message}</td></tr>`;
+      }
+    }
+
+    loadHistory();
+
+    window.goDashboard = function(){
+      window.location.href = "dashboard.html";
+    };
+  </script>
+<script type="module" src="income-control.js"></script>
+
+</body>
+</html>

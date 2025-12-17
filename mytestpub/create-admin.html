@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Create Admin – BTX.ONE</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:radial-gradient(circle at top,#0f172a,#020617 60%);
+      color:#e5f0ff;
+      font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+    }
+    .box{
+      background:rgba(15,23,42,.96);
+      border-radius:24px;
+      padding:24px 20px;
+      text-align:center;
+      box-shadow:
+        0 0 0 2px rgba(56,189,248,.7),
+        0 26px 70px rgba(0,0,0,.9);
+      max-width:360px;
+      width:100%;
+    }
+    h1{
+      font-size:18px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      margin-bottom:10px;
+    }
+    p{font-size:13px;color:#cbd5f5;margin-bottom:14px;}
+    button{
+      border:none;
+      border-radius:999px;
+      padding:10px 18px;
+      font-size:13px;
+      font-weight:600;
+      text-transform:uppercase;
+      letter-spacing:.16em;
+      background:linear-gradient(135deg,#38bdf8,#22c55e);
+      color:#020617;
+      cursor:pointer;
+      box-shadow:0 18px 45px rgba(56,189,248,.9);
+    }
+    .info{
+      font-size:12px;
+      margin-top:14px;
+      color:#a5b4fc;
+      text-align:left;
+    }
+    code{background:#020617;padding:2px 4px;border-radius:4px;font-size:11px;}
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>CREATE ADMIN</h1>
+    <p>
+      এই বাটনে ক্লিক করলে Firebase-এ<br>
+      <strong>admin@btx.one / Admin12345</strong> দিয়ে<br>
+      একটা Admin ইউজার তৈরি হবে।
+    </p>
+    <button id="btnCreate">Create / Fix Admin</button>
+
+    <div class="info">
+      <p>✔ তৈরি হলে:</p>
+      <ul style="padding-left:16px;">
+        <li>Authentication-এ user দেখা যাবে</li>
+        <li>Firestore → <code>users</code> collection-এ admin ডকুমেন্ট তৈরি হবে</li>
+        <li>localStorage-এ <code>btx_current_user_v1</code> সেট হবে</li>
+      </ul>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, db } from "./firebase-config.js";
+
+    import {
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+    import {
+      doc,
+      setDoc
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    const ADMIN_EMAIL = "admin@btx.one";
+    const ADMIN_PASS  = "Admin12345";
+
+    const STORAGE_CURRENT = "btx_current_user_v1";
+    const STORAGE_USERS   = "btx_users_v1";
+
+    function saveUsersLocal(list){
+      localStorage.setItem(STORAGE_USERS, JSON.stringify(list));
+    }
+
+    document.getElementById("btnCreate").addEventListener("click", async ()=>{
+      try{
+        let user = null;
+
+        // 1) প্রথমে Sign-in ট্রাই করব
+        try{
+          const cred = await signInWithEmailAndPassword(auth, ADMIN_EMAIL, ADMIN_PASS);
+          user = cred.user;
+        }catch(err){
+          // যদি না থাকে, তাহলে নতুন করে create করব
+          if(err.code === "auth/user-not-found"){
+            const credNew = await createUserWithEmailAndPassword(auth, ADMIN_EMAIL, ADMIN_PASS);
+            user = credNew.user;
+          }else{
+            throw err;
+          }
+        }
+
+        const uid = user.uid;
+
+        // 2) Firestore এ admin profile সেট/আপডেট
+        const profile = {
+          uid,
+          username: "admin",
+          fullName: "BTX Admin",
+          email: ADMIN_EMAIL,
+          country: "Bangladesh",
+          mobile: "+8801XXXXXXXXX",
+          refCode: "",
+          sponsor_username: "",
+          role: "admin",
+          membershipType: "free",
+          balance: 0,
+          depositTotal: 0,
+          directIncome: 0,
+          teamIncome: 0,
+          teamCount: 0,
+          createdAt: new Date().toISOString()
+        };
+
+        await setDoc(doc(db,"users",uid), profile, { merge:true });
+
+        // 3) localStorage current user হিসেবে সেট করি (admin panel পুরোনো কোডের জন্য)
+        localStorage.setItem(STORAGE_CURRENT, JSON.stringify(profile));
+
+        // 4) চাইলে localStorage users list এও রেখে দিচ্ছি (demo)
+        let arr = [];
+        try{
+          const raw = localStorage.getItem(STORAGE_USERS);
+          if(raw) arr = JSON.parse(raw);
+        }catch(e){}
+        const other = arr.filter(u=>u.uid !== uid && u.username !== "admin");
+        other.push(profile);
+        saveUsersLocal(other);
+
+        alert(
+          "✅ Admin ready!\n\nEmail: admin@btx.one\nPass: " + ADMIN_PASS +
+          "\n\nএখন login.html বা admin.html থেকে টেস্ট করতে পারো।"
+        );
+
+      }catch(err){
+        console.error(err);
+        alert("❌ Error: " + (err.message || err.code || "Unknown"));
+      }
+    });
+  </script>
+</body>
+</html>

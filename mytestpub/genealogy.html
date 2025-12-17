@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>BTX.ONE – Genealogy / Team History</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+    body{
+      min-height:100vh;
+      background:#020617;
+      color:#e5e7eb;
+      padding:16px;
+    }
+    a{color:#38bdf8;text-decoration:none}
+    .shell{max-width:1100px;margin:0 auto;}
+
+    .header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:16px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .brand img{
+      width:42px;height:42px;border-radius:999px;
+      box-shadow:0 0 18px rgba(59,130,246,.9);
+    }
+    .brand h1{
+      font-size:18px;
+      letter-spacing:.2em;
+      text-transform:uppercase;
+    }
+    .brand p{
+      font-size:11px;color:#9ca3af;
+    }
+    .btn{
+      border:none;border-radius:999px;
+      padding:7px 14px;font-size:11px;
+      text-transform:uppercase;letter-spacing:.16em;
+      cursor:pointer;background:linear-gradient(135deg,#38bdf8,#22c55e);
+      color:#020617;box-shadow:0 14px 32px rgba(56,189,248,.85);
+    }
+    .btn-outline{
+      border-radius:999px;padding:6px 12px;font-size:11px;
+      text-transform:uppercase;letter-spacing:.16em;
+      border:1px solid rgba(148,163,184,.7);
+      background:rgba(15,23,42,.9);color:#e5e7eb;cursor:pointer;
+    }
+
+    .card{
+      border-radius:20px;
+      background:radial-gradient(circle at top,#020617,#020617 60%);
+      box-shadow:0 0 0 1px rgba(30,64,175,.7),0 24px 60px rgba(0,0,0,.9);
+      padding:14px 16px;
+    }
+
+    .card h2{
+      font-size:16px;margin-bottom:4px;
+    }
+    .card p{
+      font-size:12px;color:#9ca3af;margin-bottom:10px;
+    }
+
+    /* TABLE */
+    table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:12px;
+    }
+    thead{
+      background:#0f172a;
+    }
+    th,td{
+      padding:6px 8px;
+      border-bottom:1px solid #1f2937;
+      text-align:left;
+    }
+    th{font-weight:600;color:#cbd5f5;}
+    tbody tr:nth-child(even){
+      background:#020617;
+    }
+
+    .level-row{
+      background:rgba(15,23,42,.95);
+    }
+    .level-row:hover{
+      background:#020617;
+    }
+
+    .arrow-btn{
+      background:transparent;
+      border:none;
+      color:#e5e7eb;
+      cursor:pointer;
+      font-size:14px;
+      transform-origin:center;
+      transition:transform .15s;
+    }
+    .arrow-btn.open{
+      transform:rotate(90deg);
+    }
+
+    .tag{
+      padding:2px 8px;
+      border-radius:999px;
+      font-size:10px;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      display:inline-block;
+    }
+    .tag-active{
+      background:rgba(22,163,74,.25);
+      color:#bbf7d0;
+      border:1px solid rgba(34,197,94,.7);
+    }
+    .tag-inactive{
+      background:rgba(127,29,29,.35);
+      color:#fecaca;
+      border:1px solid rgba(248,113,113,.8);
+    }
+
+    .badge-level{
+      padding:2px 7px;
+      border-radius:999px;
+      background:rgba(30,64,175,.45);
+      color:#bfdbfe;
+      font-size:11px;
+    }
+
+    .sub-table{
+      margin-top:6px;
+      border-radius:12px;
+      overflow:hidden;
+      box-shadow:0 0 0 1px rgba(55,65,81,.8);
+    }
+    .sub-table thead{
+      background:#020617;
+    }
+
+    .status-text-active{color:#4ade80;font-weight:500;}
+    .status-text-inactive{color:#f97373;}
+
+    #statusMsg{
+      font-size:12px;
+      color:#9ca3af;
+      margin-bottom:8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <!-- HEADER -->
+    <div class="header">
+      <div class="brand">
+        <img src="images/logo.png" alt="BTX">
+        <div>
+          <h1>BTX.ONE</h1>
+          <p>USDT MLM • Genealogy / Team History</p>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-outline" onclick="goDashboard()">Dashboard</button>
+        <button class="btn" onclick="logout()">Logout</button>
+      </div>
+    </div>
+
+    <!-- MAIN CARD -->
+    <div class="card">
+      <h2>Genealogy Overview</h2>
+      <p>
+        এখানে আপনি আপনার Team এর <b>Level wise</b> history দেখতে পারবেন –  
+        প্রত্যেক লেভেলে মোট কতজন, কতটা personal invest, team invest এবং Active / Inactive ID আছে।
+        Arrow (▶) তে ক্লিক করলে সেই level এর ডিটেল মেম্বার লিস্ট খুলে যাবে।
+      </p>
+
+      <div id="statusMsg">Loading team data...</div>
+
+      <table>
+        <thead>
+          <tr>
+            <th style="width:40px;">#</th>
+            <th>Level</th>
+            <th>Members</th>
+            <th>Active</th>
+            <th>Inactive</th>
+            <th>Personal Invest (Total)</th>
+            <th>Team Invest (Total)</th>
+          </tr>
+        </thead>
+        <tbody id="treeBody">
+          <!-- JS দিয়ে ভরবে -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script type="module">
+    import { db } from "./firebase-config.js";
+    import {
+      collection,
+      getDocs
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    const STORAGE_CURRENT = "btx_current_user_v1";
+
+    function getCurrentUser(){
+      const raw = localStorage.getItem(STORAGE_CURRENT);
+      if(!raw) return null;
+      try{return JSON.parse(raw);}catch{return null;}
+    }
+
+    function logout(){
+      localStorage.removeItem(STORAGE_CURRENT);
+      alert("Logged out (demo).");
+      window.location.href = "login.html";
+    }
+    function goDashboard(){
+      window.location.href = "dashboard.html";
+    }
+    window.logout = logout;
+    window.goDashboard = goDashboard;
+
+    const fmt = (v)=>"$" + (Number(v||0)).toFixed(2);
+
+    // ---------- MAIN GENEALOGY LOADER ----------
+    (async function loadGenealogy(){
+      const statusEl = document.getElementById("statusMsg");
+      const body = document.getElementById("treeBody");
+
+      const current = getCurrentUser();
+      if(!current){
+        statusEl.textContent = "Please login first.";
+        window.location.href = "login.html";
+        return;
+      }
+      const rootUser = (current.username || "").toLowerCase();
+      if(!rootUser){
+        statusEl.textContent = "Invalid current user.";
+        return;
+      }
+
+      statusEl.textContent = "Loading all users from Firestore...";
+
+      // সব user নিয়ে আসি (small থেকে medium টিমের জন্য ঠিক আছে)
+      const snap = await getDocs(collection(db,"users"));
+      const allUsers = [];
+      snap.forEach(d=>{
+        const data = d.data();
+        allUsers.push({
+          id: d.id.toLowerCase(),
+          username: (data.username || d.id || "").toLowerCase(),
+          fullName: data.fullName || "",
+          sponsor:  (data.sponsor_username || "").toLowerCase(),
+          depositTotal: Number(data.depositTotal || 0),
+          teamInvestment: Number(data.teamInvestment || 0),
+          status: (data.status || "").toLowerCase(), // optional: "active"/"inactive"
+          membershipType: data.membershipType || ""
+        });
+      });
+
+      // username field না থাকলে doc id ব্যবহার
+      allUsers.forEach(u=>{
+        if(!u.username) u.username = u.id;
+      });
+
+      // root user check
+      const me = allUsers.find(u=>u.username === rootUser || u.id === rootUser);
+      if(!me){
+        statusEl.textContent = "Current user not found in users collection.";
+        return;
+      }
+
+      // -------- Levelwise build (BFS) --------
+      const levels = [];
+      let currentLevelIds = [me.username];
+      let levelIndex = 1;
+      const MAX_LEVELS = 20;
+
+      while(currentLevelIds.length && levelIndex <= MAX_LEVELS){
+        // এই লেভেলে যাদের sponsor এই levelIds এর মধ্যে
+        const members = allUsers.filter(u =>
+          currentLevelIds.includes(u.sponsor)
+        );
+
+        if(!members.length) break;
+
+        // Stats calculate
+        const totalMembers   = members.length;
+        const activeMembers  = members.filter(isActive).length;
+        const inactiveMembers= totalMembers - activeMembers;
+
+        let sumPersonal = 0;
+        let sumTeam     = 0;
+        members.forEach(m=>{
+          sumPersonal += m.depositTotal;
+          sumTeam     += m.teamInvestment;
+        });
+
+        levels.push({
+          level: levelIndex,
+          parents: [...currentLevelIds],
+          members,
+          totalMembers,
+          activeMembers,
+          inactiveMembers,
+          sumPersonal,
+          sumTeam
+        });
+
+        // next level এর parents = এই level এর username গুলো
+        currentLevelIds = members.map(m=>m.username);
+        levelIndex++;
+      }
+
+      if(!levels.length){
+        statusEl.textContent = "No downline members found yet.";
+        body.innerHTML = "";
+        return;
+      }
+
+      statusEl.textContent = "Loaded " + levels.length + " level(s). Click arrow to expand details.";
+
+      // ---------- Render Table ----------
+      body.innerHTML = "";
+
+      levels.forEach((lvl, idx)=>{
+        const levelId = "lvl_" + lvl.level;
+
+        // summary row
+        const tr = document.createElement("tr");
+        tr.className = "level-row";
+        tr.innerHTML = `
+          <td>
+            <button class="arrow-btn" data-target="${levelId}">▶</button>
+          </td>
+          <td>
+            <span class="badge-level">Level ${lvl.level}</span>
+          </td>
+          <td>${lvl.totalMembers}</td>
+          <td><span class="tag tag-active">${lvl.activeMembers}</span></td>
+          <td><span class="tag tag-inactive">${lvl.inactiveMembers}</span></td>
+          <td>${fmt(lvl.sumPersonal)}</td>
+          <td>${fmt(lvl.sumTeam)}</td>
+        `;
+        body.appendChild(tr);
+
+        // detail row (hidden by default)
+        const trDetail = document.createElement("tr");
+        trDetail.id = levelId;
+        trDetail.style.display = "none";
+        const colSpan = 7;
+        trDetail.innerHTML = `
+          <td colspan="${colSpan}">
+            <div class="sub-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Username</th>
+                    <th>Name</th>
+                    <th>Status</th>
+                    <th>Personal Invest</th>
+                    <th>Team Invest</th>
+                    <th>Sponsor</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${lvl.members.map((m,i)=>renderMemberRow(m,i)).join("")}
+                </tbody>
+              </table>
+            </div>
+          </td>
+        `;
+        body.appendChild(trDetail);
+      });
+
+      // arrow click handler
+      body.addEventListener("click",(e)=>{
+        const btn = e.target.closest(".arrow-btn");
+        if(!btn) return;
+        const targetId = btn.getAttribute("data-target");
+        const row = document.getElementById(targetId);
+        if(!row) return;
+
+        const isOpen = row.style.display === "";
+        row.style.display = isOpen ? "none" : "";
+        btn.classList.toggle("open", !isOpen);
+      });
+
+      // ----- helpers -----
+      function isActive(user){
+        // 1) যদি status field থাকে: "active" হলে active
+        if(user.status === "active") return true;
+        if(user.status === "inactive") return false;
+
+        // 2) না থাকলে, depositTotal>0 হলে active ধরে নিলাম
+        return user.depositTotal > 0;
+      }
+
+      function renderMemberRow(m, index){
+        const active = isActive(m);
+        const statusClass = active ? "status-text-active" : "status-text-inactive";
+        const statusText  = active ? "ACTIVE" : "INACTIVE";
+        return `
+          <tr>
+            <td>${index+1}</td>
+            <td>@${m.username}</td>
+            <td>${m.fullName || "-"}</td>
+            <td class="${statusClass}">${statusText}</td>
+            <td>${fmt(m.depositTotal)}</td>
+            <td>${fmt(m.teamInvestment)}</td>
+            <td>${m.sponsor || "-"}</td>
+          </tr>
+        `;
+      }
+
+    })();
+  </script>
+</body>
+</html>
