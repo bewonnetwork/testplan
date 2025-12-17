@@ -7,255 +7,52 @@
   <style>
     *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
     body{
-      min-height:100vh;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      background:radial-gradient(circle at top,#0f172a,#020617 60%);
-      color:#e5f0ff;
+      min-height:100vh;display:flex;flex-direction:column;align-items:center;
+      background:radial-gradient(circle at top,#0f172a,#020617 60%);color:#e5f0ff;
     }
     a{text-decoration:none}
-
-    /* HEADER */
-    .top-header{
-      width:100%;
-      max-width:900px;
-      padding:10px 16px;
-      display:flex;
-      align-items:center;
-      gap:12px;
-    }
-    .logo-main{
-      width:58px;
-      height:58px;
-      border-radius:50%;
-      object-fit:cover;
-      filter:drop-shadow(0 0 10px rgba(255,255,255,.35))
-             drop-shadow(0 0 18px rgba(34,197,94,.45));
-    }
-    .site-title{
-      font-size:22px;
-      font-weight:700;
-      letter-spacing:.14em;
-      text-transform:uppercase;
-      background:linear-gradient(120deg,#38bdf8,#4ade80);
-      -webkit-background-clip:text;
-      color:transparent;
-    }
-
-    .rn-wrap{
-      width:100%;
-      max-width:520px;
-      padding:10px 18px 26px;
-    }
-    .rn-card{
-      position:relative;
-      border-radius:32px;
-      padding:26px 22px 18px;
-      background:linear-gradient(145deg,rgba(12,20,46,.98),rgba(15,23,42,.96));
-      box-shadow:
-        0 0 0 2px rgba(132,204,22,.8),
-        0 24px 60px rgba(0,0,0,.9);
-      overflow:hidden;
-    }
-    .rn-glow{
-      position:absolute;
-      inset:-100px;
-      background:
-        radial-gradient(circle at 0 0,rgba(190,242,100,.25),transparent 60%),
-        radial-gradient(circle at 100% 100%,rgba(56,189,248,.28),transparent 60%);
-      opacity:.9;
-      pointer-events:none;
-    }
+    .top-header{width:100%;max-width:900px;padding:10px 16px;display:flex;align-items:center;gap:12px;}
+    .logo-main{width:58px;height:58px;border-radius:50%;object-fit:cover;filter:drop-shadow(0 0 10px rgba(255,255,255,.35)) drop-shadow(0 0 18px rgba(34,197,94,.45));}
+    .site-title{font-size:22px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;background:linear-gradient(120deg,#38bdf8,#4ade80);-webkit-background-clip:text;color:transparent;}
+    .rn-wrap{width:100%;max-width:520px;padding:10px 18px 26px;}
+    .rn-card{position:relative;border-radius:32px;padding:26px 22px 18px;background:linear-gradient(145deg,rgba(12,20,46,.98),rgba(15,23,42,.96));
+      box-shadow:0 0 0 2px rgba(132,204,22,.8),0 24px 60px rgba(0,0,0,.9);overflow:hidden;}
+    .rn-glow{position:absolute;inset:-100px;background:
+      radial-gradient(circle at 0 0,rgba(190,242,100,.25),transparent 60%),
+      radial-gradient(circle at 100% 100%,rgba(56,189,248,.28),transparent 60%);opacity:.9;pointer-events:none;}
     .rn-inner{position:relative;z-index:1;}
-
-    .rn-title{
-      text-align:center;
-      margin-bottom:18px;
-    }
-    .rn-title h1{
-      font-size:24px;
-      letter-spacing:.28em;
-      text-transform:uppercase;
-      color:#facc15;
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-    }
+    .rn-title{text-align:center;margin-bottom:18px;}
+    .rn-title h1{font-size:24px;letter-spacing:.28em;text-transform:uppercase;color:#facc15;display:inline-flex;align-items:center;gap:8px;}
     .reg-icon{font-size:20px;}
-
-    .rn-form{
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-    }
-    .rn-row{
-      display:flex;
-      gap:10px;
-    }
+    .rn-form{display:flex;flex-direction:column;gap:10px;}
+    .rn-row{display:flex;gap:10px;}
     .rn-row > div{flex:1;}
-
-    .rn-label{
-      font-size:12px;
-      color:#e5e7eb;
-      margin-bottom:4px;
-      display:block;
-    }
-
-    .rn-field{
-      position:relative;
-      border-radius:999px;
-      padding:8px 14px 8px 36px;
-      background:rgba(15,23,42,.98);
-      box-shadow:
-        0 0 0 2px rgba(190,242,100,.8),
-        0 0 18px rgba(190,242,100,.7);
-    }
-    .rn-field input,
-    .rn-field select{
-      width:100%;
-      border:none;
-      outline:none;
-      background:transparent;
-      color:#e5f0ff;
-      font-size:13px;
-    }
-
-    .rn-icon{
-      position:absolute;
-      left:12px;
-      top:50%;
-      transform:translateY(-50%);
-      font-size:15px;
-      opacity:.9;
-      pointer-events:none;
-    }
-
-    .rn-eye{
-      position:absolute;
-      right:14px;
-      top:50%;
-      transform:translateY(-50%);
-      font-size:11px;
-      letter-spacing:.14em;
-      color:#bbf7d0;
-      cursor:pointer;
-      user-select:none;
-    }
-
-    .rn-terms{
-      display:flex;
-      align-items:center;
-      gap:6px;
-      font-size:11px;
-      color:#9ca3af;
-      margin-top:6px;
-    }
-
-    .rn-btn{
-      margin-top:12px;
-      width:100%;
-      border-radius:999px;
-      border:1px solid #facc15;
-      padding:11px 18px;
-      font-size:13px;
-      font-weight:700;
-      text-transform:uppercase;
-      letter-spacing:.18em;
-      background:#000000;
-      color:#facc15;
-      cursor:pointer;
-      box-shadow:0 18px 45px rgba(0,0,0,.9);
-      transition:.15s;
-    }
-    .rn-btn:hover{
-      transform:translateY(-1px);
-      box-shadow:0 24px 65px rgba(0,0,0,1);
-    }
-
-    .rn-bottom{
-      margin-top:12px;
-      text-align:center;
-      font-size:11px;
-      color:#e5e7eb;
-      padding:6px 0;
-    }
-    .rn-bottom a{
-      color:#facc15;
-      font-weight:600;
-    }
-
-    .hint{
-      display:block;
-      font-size:10px;
-      margin-top:3px;
-      min-height:13px;
-    }
-    .hint-ok{color:#4ade80;}
-    .hint-mid{color:#facc15;}
-    .hint-bad{color:#fb7185;}
+    .rn-label{font-size:12px;color:#e5e7eb;margin-bottom:4px;display:block;}
+    .rn-field{position:relative;border-radius:999px;padding:8px 14px 8px 36px;background:rgba(15,23,42,.98);
+      box-shadow:0 0 0 2px rgba(190,242,100,.8),0 0 18px rgba(190,242,100,.7);}
+    .rn-field input,.rn-field select{width:100%;border:none;outline:none;background:transparent;color:#e5f0ff;font-size:13px;}
+    .rn-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:15px;opacity:.9;pointer-events:none;}
+    .rn-eye{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:11px;letter-spacing:.14em;color:#bbf7d0;cursor:pointer;user-select:none;}
+    .rn-terms{display:flex;align-items:center;gap:6px;font-size:11px;color:#9ca3af;margin-top:6px;}
+    .rn-btn{margin-top:12px;width:100%;border-radius:999px;border:1px solid #facc15;padding:11px 18px;font-size:13px;font-weight:700;
+      text-transform:uppercase;letter-spacing:.18em;background:#000;color:#facc15;cursor:pointer;box-shadow:0 18px 45px rgba(0,0,0,.9);transition:.15s;}
+    .rn-btn:hover{transform:translateY(-1px);box-shadow:0 24px 65px rgba(0,0,0,1);}
+    .rn-bottom{margin-top:12px;text-align:center;font-size:11px;color:#e5e7eb;padding:6px 0;}
+    .rn-bottom a{color:#facc15;font-weight:600;}
+    .hint{display:block;font-size:10px;margin-top:3px;min-height:13px;}
+    .hint-ok{color:#4ade80;} .hint-mid{color:#facc15;} .hint-bad{color:#fb7185;}
 
     /* ✅ 3D Success Overlay */
-    .reg-success-overlay{
-      position:fixed;
-      inset:0;
-      background:radial-gradient(circle at top,#0f172a,#020617 75%);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      z-index:9999;
-    }
-    .reg-success-card{
-      width:260px;
-      border-radius:24px;
-      padding:18px 16px 16px;
-      text-align:center;
-      background:linear-gradient(145deg,#022c22,#0f172a);
-      box-shadow:
-        0 0 0 2px rgba(74,222,128,.8),
-        0 26px 70px rgba(0,0,0,1);
-      color:#bbf7d0;
-      animation:popIn .35s ease-out;
-    }
-    .reg-success-icon{
-      width:60px;
-      height:60px;
-      border-radius:999px;
-      margin:0 auto 8px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:30px;
-      background:radial-gradient(circle,#4ade80,#16a34a);
-      box-shadow:0 0 26px rgba(74,222,128,1);
-      color:#022c22;
-    }
-    .reg-success-title{
-      font-size:16px;
-      font-weight:700;
-      letter-spacing:.14em;
-      text-transform:uppercase;
-      margin-bottom:4px;
-    }
-    .reg-success-text{
-      font-size:12px;
-      color:#e5f0ff;
-      margin-bottom:6px;
-    }
-    .reg-success-sub{
-      font-size:11px;
-      color:#a5b4fc;
-    }
-    @keyframes popIn{
-      0%{transform:scale(.6);opacity:0;}
-      100%{transform:scale(1);opacity:1;}
-    }
-
-    @media(max-width:480px){
-      .rn-card{padding:22px 18px 16px;}
-      .rn-row{flex-direction:column;}
-      .top-header{justify-content:center;}
-    }
+    .reg-success-overlay{position:fixed;inset:0;background:radial-gradient(circle at top,#0f172a,#020617 75%);display:none;align-items:center;justify-content:center;z-index:9999;}
+    .reg-success-card{width:260px;border-radius:24px;padding:18px 16px 16px;text-align:center;background:linear-gradient(145deg,#022c22,#0f172a);
+      box-shadow:0 0 0 2px rgba(74,222,128,.8),0 26px 70px rgba(0,0,0,1);color:#bbf7d0;animation:popIn .35s ease-out;}
+    .reg-success-icon{width:60px;height:60px;border-radius:999px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:30px;
+      background:radial-gradient(circle,#4ade80,#16a34a);box-shadow:0 0 26px rgba(74,222,128,1);color:#022c22;}
+    .reg-success-title{font-size:16px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:4px;}
+    .reg-success-text{font-size:12px;color:#e5f0ff;margin-bottom:6px;}
+    .reg-success-sub{font-size:11px;color:#a5b4fc;}
+    @keyframes popIn{0%{transform:scale(.6);opacity:0;}100%{transform:scale(1);opacity:1;}}
+    @media(max-width:480px){.rn-card{padding:22px 18px 16px;}.rn-row{flex-direction:column;}.top-header{justify-content:center;}}
   </style>
 </head>
 <body>
@@ -275,7 +72,7 @@
       </div>
 
       <form id="registerForm" class="rn-form">
-        <!-- Full Name -->
+
         <div>
           <label class="rn-label">Full Name</label>
           <div class="rn-field">
@@ -284,7 +81,6 @@
           </div>
         </div>
 
-        <!-- Username + Email -->
         <div class="rn-row">
           <div>
             <label class="rn-label">Username</label>
@@ -302,7 +98,6 @@
           </div>
         </div>
 
-        <!-- Country + Mobile -->
         <div class="rn-row">
           <div>
             <label class="rn-label">Select Country</label>
@@ -310,47 +105,13 @@
               <span class="rn-icon">🌍</span>
               <select id="country" required>
                 <option value="">Select Country</option>
-                <option value="Afghanistan" data-code="+93">Afghanistan (+93)</option>
-                <option value="Australia" data-code="+61">Australia (+61)</option>
                 <option value="Bangladesh" data-code="+880">Bangladesh (+880)</option>
-                <option value="Belgium" data-code="+32">Belgium (+32)</option>
-                <option value="Bhutan" data-code="+975">Bhutan (+975)</option>
-                <option value="Brazil" data-code="+55">Brazil (+55)</option>
-                <option value="Canada" data-code="+1">Canada (+1)</option>
-                <option value="China" data-code="+86">China (+86)</option>
-                <option value="Denmark" data-code="+45">Denmark (+45)</option>
-                <option value="Egypt" data-code="+20">Egypt (+20)</option>
-                <option value="France" data-code="+33">France (+33)</option>
-                <option value="Germany" data-code="+49">Germany (+49)</option>
                 <option value="India" data-code="+91">India (+91)</option>
-                <option value="Indonesia" data-code="+62">Indonesia (+62)</option>
-                <option value="Italy" data-code="+39">Italy (+39)</option>
-                <option value="Japan" data-code="+81">Japan (+81)</option>
-                <option value="Kuwait" data-code="+965">Kuwait (+965)</option>
-                <option value="Malaysia" data-code="+60">Malaysia (+60)</option>
-                <option value="Maldives" data-code="+960">Maldives (+960)</option>
-                <option value="Myanmar" data-code="+95">Myanmar (+95)</option>
-                <option value="Nepal" data-code="+977">Nepal (+977)</option>
-                <option value="Netherlands" data-code="+31">Netherlands (+31)</option>
-                <option value="New Zealand" data-code="+64">New Zealand (+64)</option>
-                <option value="Oman" data-code="+968">Oman (+968)</option>
                 <option value="Pakistan" data-code="+92">Pakistan (+92)</option>
-                <option value="Philippines" data-code="+63">Philippines (+63)</option>
-                <option value="Qatar" data-code="+974">Qatar (+974)</option>
-                <option value="Russia" data-code="+7">Russia (+7)</option>
-                <option value="Saudi Arabia" data-code="+966">Saudi Arabia (+966)</option>
-                <option value="Singapore" data-code="+65">Singapore (+65)</option>
-                <option value="South Africa" data-code="+27">South Africa (+27)</option>
-                <option value="Spain" data-code="+34">Spain (+34)</option>
-                <option value="Sri Lanka" data-code="+94">Sri Lanka (+94)</option>
-                <option value="Sweden" data-code="+46">Sweden (+46)</option>
-                <option value="Switzerland" data-code="+41">Switzerland (+41)</option>
-                <option value="Thailand" data-code="+66">Thailand (+66)</option>
-                <option value="Turkey" data-code="+90">Turkey (+90)</option>
                 <option value="UAE" data-code="+971">United Arab Emirates (+971)</option>
                 <option value="UK" data-code="+44">United Kingdom (+44)</option>
                 <option value="USA" data-code="+1">United States (+1)</option>
-                <option value="Vietnam" data-code="+84">Vietnam (+84)</option>
+                <!-- তোমার বাকি দেশগুলো চাইলে আগের মতো যোগ করে দাও -->
               </select>
             </div>
           </div>
@@ -364,7 +125,6 @@
           </div>
         </div>
 
-        <!-- Password -->
         <div class="rn-row">
           <div>
             <label class="rn-label">Password</label>
@@ -386,16 +146,38 @@
           </div>
         </div>
 
-        <!-- Referral -->
+        <!-- ✅ Sponsor/Referral (একটাই ফিল্ড) -->
         <div>
-          <label class="rn-label">Referral Code (optional)</label>
+          <label class="rn-label">Sponsor / Referral Username</label>
           <div class="rn-field">
-            <span class="rn-icon">🎯</span>
-            <input id="refCode" />
+            <span class="rn-icon">👥</span>
+            <input id="sponsor" placeholder="e.g. rafi / admin" required />
+          </div>
+          <small id="sponsorHint" class="hint"></small>
+        </div>
+
+        <div class="rn-row">
+          <div>
+            <label class="rn-label">Placement Side</label>
+            <div class="rn-field">
+              <span class="rn-icon">🌳</span>
+              <select id="binSide" required>
+                <option value="L">Left (L)</option>
+                <option value="R">Right (R)</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="rn-label">Placement Username (optional)</label>
+            <div class="rn-field">
+              <span class="rn-icon">📍</span>
+              <input id="placement" placeholder="Auto if empty" />
+            </div>
+            <small id="placeHint" class="hint"></small>
           </div>
         </div>
 
-        <!-- Terms -->
         <label class="rn-terms">
           <input id="terms" type="checkbox" required />
           <span>I accept the Terms &amp; Conditions</span>
@@ -405,31 +187,22 @@
       </form>
 
       <div class="rn-bottom">
-        Already have an account?
-        <a href="login.html">Login</a>
+        Already have an account? <a href="login.html">Login</a>
       </div>
 
     </div>
   </div>
 </div>
 
-<!-- ✅ 3D Success Overlay -->
 <div id="regSuccessOverlay" class="reg-success-overlay">
   <div class="reg-success-card">
     <div class="reg-success-icon">✔</div>
     <div class="reg-success-title">SUCCESS</div>
-    <div class="reg-success-text" id="regSuccessText">
-      Registration complete!
-    </div>
-    <div class="reg-success-sub" id="regSuccessSub">
-      Redirecting to Login...
-    </div>
+    <div class="reg-success-text" id="regSuccessText">Registration complete!</div>
+    <div class="reg-success-sub" id="regSuccessSub">Redirecting to Login...</div>
   </div>
 </div>
 
-<!-- সব লজিক এখন register.js এ -->
 <script type="module" src="register.js"></script>
-
-
 </body>
 </html>
