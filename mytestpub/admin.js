@@ -671,4 +671,52 @@ window.runROIForAll = runROIForAll;
     console.error(err);
     alert("Admin load error: " + err.message);
   }
+  // ----------------- BINARY MATCHING (ADMIN BUTTON) -----------------
+window.runBinaryForAll = async function () {
+  if (!confirm("Run Binary Matching for all users?")) return;
+
+  try {
+    // ✅ Safe dynamic import (admin panel ভাঙবে না)
+    const mod = await import("./income-engine.js");
+    const res = await mod.runBinaryForAllUsers();
+
+    alert(
+      "✅ Binary Matching Done\n" +
+      "Done: " + (res.done ?? 0) + "\n" +
+      "Skipped: " + (res.skipped ?? 0) + "\n" +
+      "Day: " + (res.day ?? "") + "\n" +
+      "Percent: " + (res.percent ?? "")
+    );
+  } catch (err) {
+    console.error(err);
+    alert("❌ Binary Error: " + (err.message || err));
+  }
+};
 })();
+// ----------------- BINARY MATCHING (ADMIN BUTTON) -----------------
+// ✅ SAFE: no top-level import, so admin.js will NOT break
+window.runBinaryForAll = async function () {
+  if (!confirm("Run Binary Matching for all users?")) return;
+
+  try {
+    const mod = await import("./income-engine.js");
+    const runBinaryForAllUsers = mod.runBinaryForAllUsers;
+
+    if (typeof runBinaryForAllUsers !== "function") {
+      alert("income-engine.js এ runBinaryForAllUsers পাওয়া যায়নি।");
+      return;
+    }
+
+    const res = await runBinaryForAllUsers();
+
+    alert(
+      "✅ Binary Matching Done\n" +
+      "Done: " + (res?.done ?? 0) + "\n" +
+      "Skipped: " + (res?.skipped ?? 0) + "\n" +
+      "Day: " + (res?.day ?? "-")
+    );
+  } catch (err) {
+    console.error(err);
+    alert("❌ Binary Error: " + (err?.message || err));
+  }
+};

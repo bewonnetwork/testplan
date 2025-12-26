@@ -5,7 +5,7 @@
   <title>BTX.ONE – Member Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Chart.js for charts -->
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
@@ -29,591 +29,265 @@
     }
     a{color:var(--accent-blue);text-decoration:none}
 
-    .shell{
-      max-width:1100px;
-      margin:0 auto;
-    }
+    .shell{max-width:1100px;margin:0 auto;}
 
     /* HEADER */
     .dash-header{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      margin-bottom:10px;
+      display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;
     }
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:10px;
-    }
+    .brand{display:flex;align-items:center;gap:10px;}
     .brand-logo-img{
-      width:52px;
-      height:52px;
-      border-radius:999px;
-      object-fit:cover;
-      background:#020617;
-      box-shadow:
-        0 0 0 2px rgba(56,189,248,.9),
-        0 0 26px rgba(56,189,248,.9);
+      width:52px;height:52px;border-radius:999px;object-fit:cover;background:#020617;
+      box-shadow:0 0 0 2px rgba(56,189,248,.9),0 0 26px rgba(56,189,248,.9);
     }
-    .brand-title h1{
-      font-size:18px;
-      letter-spacing:.22em;
-      text-transform:uppercase;
-    }
-    .brand-title p{
-      font-size:11px;
-      color:#9ca3af;
-      margin-top:2px;
-    }
+    .brand-title h1{font-size:18px;letter-spacing:.22em;text-transform:uppercase;}
+    .brand-title p{font-size:11px;color:#9ca3af;margin-top:2px;}
 
-    .header-actions{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      font-size:12px;
-      position:relative;
-    }
+    .header-actions{display:flex;align-items:center;gap:8px;font-size:12px;position:relative;}
     .btn-small{
-      border:none;
-      border-radius:999px;
-      padding:7px 14px;
-      font-size:11px;
-      text-transform:uppercase;
-      letter-spacing:.16em;
-      cursor:pointer;
+      border:none;border-radius:999px;padding:7px 14px;font-size:11px;
+      text-transform:uppercase;letter-spacing:.16em;cursor:pointer;
       background:linear-gradient(135deg,var(--accent-blue),var(--accent-green));
-      color:#020617;
-      box-shadow:0 14px 32px rgba(56,189,248,.85);
+      color:#020617;box-shadow:0 14px 32px rgba(56,189,248,.85);
     }
     .btn-outline-small{
-      border-radius:999px;
-      padding:6px 12px;
-      font-size:11px;
-      text-transform:uppercase;
-      letter-spacing:.16em;
-      border:1px solid rgba(148,163,184,.7);
-      background:rgba(15,23,42,.9);
-      color:#e5e7eb;
-      cursor:pointer;
+      border-radius:999px;padding:6px 12px;font-size:11px;text-transform:uppercase;
+      letter-spacing:.16em;border:1px solid rgba(148,163,184,.7);
+      background:rgba(15,23,42,.9);color:#e5e7eb;cursor:pointer;
     }
-    .menu-dot{
-      width:30px;
-      text-align:center;
-      padding:6px 0;
-      font-weight:700;
-    }
+    .menu-dot{width:34px;text-align:center;padding:6px 0;font-weight:900;}
     .menu-dropdown{
-      position:absolute;
-      right:0;
-      top:115%;
-      background:var(--card-bg);
-      border-radius:12px;
+      position:absolute;right:0;top:115%;
+      background:var(--card-bg);border-radius:12px;
       box-shadow:0 18px 40px rgba(0,0,0,.9);
       border:1px solid var(--card-border);
-      padding:6px;
-      min-width:150px;
-      display:none;
-      z-index:30;
+      padding:6px;min-width:190px;display:none;z-index:30;
     }
     .menu-dropdown button{
-      width:100%;
-      border:none;
-      background:transparent;
-      color:#e5f0ff;
-      font-size:12px;
-      padding:6px 8px;
-      text-align:left;
-      border-radius:8px;
-      cursor:pointer;
+      width:100%;border:none;background:transparent;color:#e5f0ff;font-size:12px;
+      padding:7px 10px;text-align:left;border-radius:8px;cursor:pointer;
     }
-    .menu-dropdown button:hover{
-      background:rgba(30,64,175,.9);
-    }
+    .menu-dropdown button:hover{background:rgba(30,64,175,.9);}
 
     /* MAIN CARD */
     .dash-card-main{
-      position:relative;
-      border-radius:26px;
-      padding:12px 18px 20px;
+      position:relative;border-radius:26px;padding:12px 18px 18px;
       background:linear-gradient(135deg,rgba(15,23,42,.98),rgba(15,23,42,.99));
-      box-shadow:
-        0 0 0 2px rgba(56,189,248,.65),
-        0 26px 70px rgba(0,0,0,.95);
+      box-shadow:0 0 0 2px rgba(56,189,248,.65),0 26px 70px rgba(0,0,0,.95);
       overflow:hidden;
     }
     .dash-glow{
-      position:absolute;
-      inset:-120px;
+      position:absolute;inset:-120px;
       background:
         radial-gradient(circle at -10% -10%,rgba(56,189,248,.4),transparent 60%),
         radial-gradient(circle at 110% 110%,rgba(34,197,94,.4),transparent 55%);
-      opacity:.8;
-      pointer-events:none;
+      opacity:.8;pointer-events:none;
     }
     .dash-inner{position:relative;z-index:1;}
 
     /* NOTICE */
     .notice-wrap{
-      margin:4px 0 10px;
-      border-radius:999px;
-      background:rgba(15,23,42,.96);
-      border:1px solid rgba(250,204,21,.7);
-      overflow:hidden;
-      padding:3px 0;
+      margin:4px 0 10px;border-radius:999px;background:rgba(15,23,42,.96);
+      border:1px solid rgba(250,204,21,.7);overflow:hidden;padding:3px 0;
     }
     .notice-text{
-      display:inline-block;
-      padding:3px 16px;
-      white-space:nowrap;
-      font-size:11px;
-      color:#facc15;
+      display:inline-block;padding:3px 16px;white-space:nowrap;font-size:11px;color:#facc15;
       animation:ticker 35s linear infinite alternate;
     }
-    @keyframes ticker{
-      0%  {transform:translateX(-100%);}
-      100%{transform:translateX(100%);}
-    }
+    @keyframes ticker{0%{transform:translateX(-100%);}100%{transform:translateX(100%);} }
 
     /* WELCOME */
     .welcome-row{
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-bottom:14px;
+      display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px;
     }
-    .welcome-main{
-      flex:1;
-      min-width:220px;
-    }
-    .welcome-main h2{
-      font-size:20px;
-      margin-bottom:4px;
-    }
-    .welcome-main span{
-      color:#a5b4fc;
-      font-size:13px;
-    }
+    .welcome-main{flex:1;min-width:220px;}
+    .welcome-main h2{font-size:20px;margin-bottom:4px;}
+    .welcome-main span{color:#a5b4fc;font-size:13px;}
     .badge-role{
-      display:inline-flex;
-      align-items:center;
-      gap:4px;
-      border-radius:999px;
-      padding:3px 10px;
-      font-size:10px;
-      margin-top:6px;
-      border:1px solid rgba(74,222,128,.7);
-      background:rgba(22,163,74,.2);
-      color:#bbf7d0;
+      display:inline-flex;align-items:center;gap:4px;border-radius:999px;
+      padding:3px 10px;font-size:10px;margin-top:6px;
+      border:1px solid rgba(74,222,128,.7);background:rgba(22,163,74,.2);color:#bbf7d0;
     }
-    .badge-member{
-      border-color:rgba(56,189,248,.7);
-      background:rgba(37,99,235,.3);
-      color:#bae6fd;
-    }
-    .member-status{
-      margin-top:4px;
-      font-size:11px;
-      color:#bbf7d0;
-    }
-
-    .welcome-right{
-      min-width:200px;
-      max-width:260px;
-      font-size:12px;
-      color:#cbd5f5;
-    }
+    .badge-member{border-color:rgba(56,189,248,.7);background:rgba(37,99,235,.3);color:#bae6fd;}
+    .member-status{margin-top:4px;font-size:11px;color:#bbf7d0;}
+    .welcome-right{min-width:220px;max-width:280px;font-size:12px;color:#cbd5f5;}
     .welcome-right div{margin-bottom:2px;}
 
-    /* LIVE SNAPSHOT CARD */
+    /* SMALL TOP NOTES */
+    .mini-notes{
+      display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px;
+    }
+    .mini-pill{
+      border:1px solid rgba(148,163,184,.55);
+      background:rgba(2,6,23,.55);
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:11px;color:#cbd5f5;
+    }
+
+    /* LIVE SNAPSHOT */
     .live-snapshot{
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-      border-radius:22px;
-      padding:12px 14px;
+      display:flex;flex-direction:column;gap:6px;border-radius:22px;padding:12px 14px;
       background:radial-gradient(circle at 0 0,#020617,#020617 70%);
-      box-shadow:
-        0 0 0 1px var(--card-border),
-        0 22px 50px rgba(15,23,42,.96);
-      margin-bottom:14px;
+      box-shadow:0 0 0 1px var(--card-border),0 22px 50px rgba(15,23,42,.96);
+      margin-bottom:12px;
     }
-    .live-snapshot-header{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      margin-bottom:4px;
-    }
+    .live-snapshot-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
     .live-snapshot-title{
-      font-size:13px;
-      letter-spacing:.14em;
-      text-transform:uppercase;
-      color:#e5f0ff;
+      font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#e5f0ff;
     }
     .live-snapshot-badge{
-      font-size:10px;
-      padding:3px 8px;
-      border-radius:999px;
-      border:1px solid rgba(52,211,153,.8);
-      color:#bbf7d0;
-      background:rgba(6,95,70,.4);
+      font-size:10px;padding:3px 8px;border-radius:999px;
+      border:1px solid rgba(52,211,153,.8);color:#bbf7d0;background:rgba(6,95,70,.4);
     }
-    .live-snapshot-row{
-      display:flex;
-      justify-content:space-between;
-      gap:8px;
-      font-size:12px;
-    }
-    .live-snapshot-row span:first-child{
-      color:#9ca3af;
-    }
-    .live-snapshot-row span.value{
-      color:var(--accent-green);
-      font-weight:600;
-    }
+    .live-snapshot-row{display:flex;justify-content:space-between;gap:8px;font-size:12px;}
+    .live-snapshot-row span:first-child{color:#9ca3af;}
+    .live-snapshot-row span.value{color:var(--accent-green);font-weight:600;}
 
     /* SUMMARY GRID */
     .summary-grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
-      gap:10px;
-      margin-bottom:16px;
+      display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+      gap:10px;margin-bottom:14px;
     }
     .summary-card{
-      border-radius:18px;
-      padding:10px 12px;
-      background:var(--card-bg);
-      box-shadow:
-        0 0 0 1px var(--card-border),
-        0 14px 32px rgba(15,23,42,.95);
-      font-size:12px;
-      transition:transform .15s, box-shadow .15s, border-color .15s;
+      border-radius:18px;padding:10px 12px;background:var(--card-bg);
+      box-shadow:0 0 0 1px var(--card-border),0 14px 32px rgba(15,23,42,.95);
+      font-size:12px;transition:transform .15s, box-shadow .15s, border-color .15s;
     }
-    .summary-card p{
-      color:#9ca3af;
-      margin-bottom:3px;
-    }
-    .summary-card h3{
-      font-size:18px;
-      font-weight:700;
-    }
-    .summary-tag{
-      font-size:10px;
-      text-transform:uppercase;
-      letter-spacing:.12em;
-      color:#a5b4fc;
-      margin-top:2px;
-    }
+    .summary-card p{color:#9ca3af;margin-bottom:3px;}
+    .summary-card h3{font-size:18px;font-weight:700;}
+    .summary-tag{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:#a5b4fc;margin-top:2px;}
     .summary-card:hover{
       transform:translateY(-4px) scale(1.02);
-      box-shadow:
-        0 0 0 1px rgba(56,189,248,.9),
-        0 18px 40px rgba(15,23,42,1);
+      box-shadow:0 0 0 1px rgba(56,189,248,.9),0 18px 40px rgba(15,23,42,1);
     }
+    .gold-border{box-shadow:0 0 0 1px rgba(250,204,21,.8),0 18px 40px rgba(15,23,42,1);}
 
     /* REFERRAL */
     .ref-card{
-      border-radius:18px;
-      padding:12px 12px 12px;
-      background:var(--card-bg);
-      box-shadow:
-        0 0 0 1px rgba(56,189,248,.55),
-        0 18px 40px rgba(15,23,42,.96);
-      margin-bottom:14px;
+      border-radius:18px;padding:12px;background:var(--card-bg);
+      box-shadow:0 0 0 1px rgba(56,189,248,.55),0 18px 40px rgba(15,23,42,.96);
+      margin-bottom:12px;
     }
-    .ref-header{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:8px;
-      margin-bottom:6px;
-    }
-    .ref-header h3{
-      font-size:14px;
-    }
-    .ref-header span{
-      font-size:11px;
-      color:#9ca3af;
-    }
-    .ref-body{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-    }
-    .ref-input{
-      flex:1;
-      min-width:200px;
-    }
+    .ref-header{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px;}
+    .ref-header h3{font-size:14px;}
+    .ref-header span{font-size:11px;color:#9ca3af;}
+    .ref-body{display:flex;gap:8px;flex-wrap:wrap;}
+    .ref-input{flex:1;min-width:200px;}
     .ref-input input{
-      width:100%;
-      padding:8px 10px;
-      border-radius:999px;
-      border:none;
-      outline:none;
-      background:rgba(15,23,42,1);
-      color:#e5f0ff;
-      font-size:12px;
+      width:100%;padding:8px 10px;border-radius:999px;border:none;outline:none;
+      background:rgba(15,23,42,1);color:#e5f0ff;font-size:12px;
       box-shadow:0 0 0 1px rgba(148,163,184,.7);
     }
     .ref-btn{
-      border:none;
-      border-radius:999px;
-      padding:8px 14px;
-      font-size:11px;
-      text-transform:uppercase;
-      letter-spacing:.14em;
-      cursor:pointer;
+      border:none;border-radius:999px;padding:8px 14px;font-size:11px;
+      text-transform:uppercase;letter-spacing:.14em;cursor:pointer;
       background:linear-gradient(135deg,var(--accent-blue),var(--accent-green));
-      color:#020617;
-      box-shadow:0 14px 34px rgba(59,130,246,.9);
+      color:#020617;box-shadow:0 14px 34px rgba(59,130,246,.9);
       white-space:nowrap;
     }
 
     /* INFO GRID */
     .info-grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-      gap:10px;
-      margin-bottom:16px;
+      display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:10px;margin-bottom:14px;
     }
     .info-card{
-      border-radius:16px;
-      padding:10px 12px;
-      background:var(--card-bg);
-      box-shadow:
-        0 0 0 1px var(--card-border),
-        0 14px 30px rgba(15,23,42,.96);
+      border-radius:16px;padding:10px 12px;background:var(--card-bg);
+      box-shadow:0 0 0 1px var(--card-border),0 14px 30px rgba(15,23,42,.96);
       font-size:12px;
     }
-    .info-card h4{
-      font-size:13px;
-      margin-bottom:6px;
-    }
-    .info-row{
-      display:flex;
-      justify-content:space-between;
-      margin-bottom:2px;
-    }
-    .info-row span:first-child{
-      color:#9ca3af;
-    }
+    .info-card h4{font-size:13px;margin-bottom:6px;}
+    .info-row{display:flex;justify-content:space-between;margin-bottom:2px;}
+    .info-row span:first-child{color:#9ca3af;}
 
-    /* BAROMETER EXTRA */
-    .barometer-box{
-      margin-top:4px;
-    }
+    /* BAROMETER */
     .bar-progress{
-      width:100%;
-      height:16px;
-      border-radius:999px;
-      background:#020617;
-      box-shadow:0 0 0 1px rgba(148,163,184,.7) inset;
-      overflow:hidden;
+      width:100%;height:16px;border-radius:999px;background:#020617;
+      box-shadow:0 0 0 1px rgba(148,163,184,.7) inset;overflow:hidden;
     }
     .bar-progress-inner{
-      height:100%;
-      border-radius:999px;
-      background:linear-gradient(90deg,var(--accent-blue),var(--accent-green));
-      text-align:center;
-      font-size:10px;
-      line-height:16px;
-      color:#020617;
-      white-space:nowrap;
+      height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent-blue),var(--accent-green));
+      text-align:center;font-size:10px;line-height:16px;color:#020617;white-space:nowrap;
     }
-
-    .bar-invest-grid{
-      display:flex;
-      gap:6px;
-      margin:6px 0 8px;
-    }
+    .bar-invest-grid{display:flex;gap:6px;margin:6px 0 8px;}
     .mini-invest-card{
-      flex:1;
-      border-radius:10px;
-      padding:4px 6px;
-      background:radial-gradient(circle at top,#020617,#020617 65%);
-      box-shadow:
-        0 0 0 1px rgba(148,163,184,.6),
-        0 10px 20px rgba(15,23,42,.9);
+      flex:1;border-radius:10px;padding:4px 6px;background:radial-gradient(circle at top,#020617,#020617 65%);
+      box-shadow:0 0 0 1px rgba(148,163,184,.6),0 10px 20px rgba(15,23,42,.9);
       font-size:11px;
     }
-    .mini-invest-card p{
-      margin-bottom:1px;
-      color:#9ca3af;
-      font-size:10px;
-    }
-    .mini-invest-card h5{
-      font-size:13px;
-    }
+    .mini-invest-card p{margin-bottom:1px;color:#9ca3af;font-size:10px;}
+    .mini-invest-card h5{font-size:13px;}
 
-    .barometer-layout{
-      display:flex;
-      gap:8px;
-      align-items:flex-end;
-      margin-top:4px;
-    }
-    .barometer-left{
-      flex:1.6;
-    }
-
+    .barometer-layout{display:flex;gap:8px;align-items:flex-end;margin-top:4px;}
+    .barometer-left{flex:1.6;}
     .bar-vertical-box{
-      flex:0.8;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      font-size:10px;
-      color:#9ca3af;
-      gap:4px;
+      flex:0.8;display:flex;flex-direction:column;align-items:center;
+      font-size:10px;color:#9ca3af;gap:4px;
     }
     .bar-vertical{
-      width:26px;
-      height:120px;
-      border-radius:999px;
-      background:linear-gradient(180deg,#020617,#020617 40%);
-      box-shadow:
-        0 0 0 1px rgba(148,163,184,.65) inset,
-        0 12px 25px rgba(15,23,42,.9);
-      padding:3px;
-      display:flex;
-      align-items:flex-end;
-      overflow:hidden;
+      width:26px;height:120px;border-radius:999px;background:linear-gradient(180deg,#020617,#020617 40%);
+      box-shadow:0 0 0 1px rgba(148,163,184,.65) inset,0 12px 25px rgba(15,23,42,.9);
+      padding:3px;display:flex;align-items:flex-end;overflow:hidden;
     }
     .bar-vertical-inner{
-      width:100%;
-      border-radius:999px;
-      background:linear-gradient(180deg,var(--accent-blue),var(--accent-green));
+      width:100%;border-radius:999px;background:linear-gradient(180deg,var(--accent-blue),var(--accent-green));
       box-shadow:0 0 12px rgba(248,250,252,.35);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:8px;
-      color:#020617;
+      display:flex;align-items:center;justify-content:center;font-size:8px;color:#020617;
     }
 
     /* CHARTS */
     .charts-grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-      gap:12px;
-      margin-bottom:4px;
+      display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+      gap:12px;margin-bottom:6px;
     }
     .chart-card{
-      border-radius:18px;
-      padding:10px 12px 14px;
-      background:var(--card-bg);
-      box-shadow:
-        0 0 0 1px var(--card-border),
-        0 18px 40px rgba(15,23,42,.96);
+      border-radius:18px;padding:10px 12px 14px;background:var(--card-bg);
+      box-shadow:0 0 0 1px var(--card-border),0 18px 40px rgba(15,23,42,.96);
     }
-    .chart-card h4{
-      font-size:13px;
-      margin-bottom:4px;
-    }
-    canvas{
-      max-width:100%;
+    .chart-card h4{font-size:13px;margin-bottom:4px;}
+    canvas{max-width:100%;}
+    .note{margin-top:6px;font-size:10px;color:#9ca3af;}
+
+    /* small copy button */
+    .copy-wrap{display:inline-flex;align-items:center;gap:4px;}
+    .copy-btn{
+      border:none;border-radius:999px;padding:3px 7px;font-size:10px;text-transform:uppercase;
+      letter-spacing:.12em;cursor:pointer;background:#0f172a;color:#e5e7eb;border:1px solid #475569;
     }
 
-    .note{
-      margin-top:6px;
-      font-size:10px;
-      color:#9ca3af;
+    /* TRANSACTION HISTORY */
+    .txn-card{
+      border-radius:18px;padding:10px 12px;background:rgba(15,23,42,.96);
+      box-shadow:0 0 0 1px rgba(148,163,184,.5);
+      margin-top:10px;font-size:12px;
+    }
+    .txn-header-row{
+      display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;
+    }
+    .txn-header-row h4{
+      font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#e5f0ff;
+    }
+    .txn-filter-row{display:flex;gap:8px;flex-wrap:wrap;}
+    .txn-filter-row select,.txn-filter-row input{
+      border-radius:999px;border:1px solid rgba(148,163,184,.6);
+      background:#020617;color:#e5f0ff;padding:6px 10px;font-size:11px;outline:none;min-width:120px;
+    }
+    .txn-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:8px;}
+    .txn-table th,.txn-table td{
+      padding:6px;border-bottom:1px solid rgba(30,64,175,.6);white-space:nowrap;
+    }
+    .txn-table th{
+      font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af;
     }
 
     @media(max-width:640px){
       body{padding:10px;}
       .dash-header{flex-direction:column;align-items:flex-start;gap:8px;}
     }
-
-    /* small copy button (Sponsor copy) */
-    .copy-wrap{
-      display:inline-flex;
-      align-items:center;
-      gap:4px;
-    }
-    .copy-btn{
-      border:none;
-      border-radius:999px;
-      padding:3px 7px;
-      font-size:10px;
-      text-transform:uppercase;
-      letter-spacing:.12em;
-      cursor:pointer;
-      background:#0f172a;
-      color:#e5e7eb;
-      border:1px solid #475569;
-    }
-        /* TRANSACTION HISTORY (inside dashboard) */
-    .txn-card{
-      border-radius:18px;
-      padding:10px 12px;
-      background:rgba(15,23,42,.96);
-      box-shadow:0 0 0 1px rgba(148,163,184,.5);
-      margin-top:10px;
-      font-size:12px;
-    }
-    .txn-header-row{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:8px;
-      margin-bottom:6px;
-      flex-wrap:wrap;
-    }
-    .txn-header-row h4{
-      font-size:13px;
-      letter-spacing:.14em;
-      text-transform:uppercase;
-      color:#e5f0ff;
-    }
-    .txn-filter-row{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-    }
-    .txn-filter-row select,
-    .txn-filter-row input{
-      border-radius:999px;
-      border:1px solid rgba(148,163,184,.6);
-      background:#020617;
-      color:#e5f0ff;
-      padding:6px 10px;
-      font-size:11px;
-      outline:none;
-      min-width:120px;
-    }
-
-    .txn-table{
-      width:100%;
-      border-collapse:collapse;
-      font-size:11px;
-      margin-top:8px;
-    }
-    .txn-table th,
-    .txn-table td{
-      padding:6px 6px;
-      border-bottom:1px solid rgba(30,64,175,.6);
-      white-space:nowrap;
-    }
-    .txn-table th{
-      font-size:10px;
-      text-transform:uppercase;
-      letter-spacing:.12em;
-      color:#9ca3af;
-    }
-    .txn-tag{
-      display:inline-flex;
-      padding:2px 8px;
-      border-radius:999px;
-      font-size:10px;
-      text-transform:uppercase;
-      letter-spacing:.12em;
-      border:1px solid rgba(148,163,184,.8);
-    }
-    .txn-plus{color:#22c55e;font-weight:600;}
-    .txn-minus{color:#f97316;font-weight:600;}
-
   </style>
 </head>
+
 <body>
   <div class="shell">
     <!-- HEADER -->
@@ -627,20 +301,17 @@
       </div>
 
       <div class="header-actions">
-        <button id="adminBtn" class="btn-outline-small" style="display:none;"
-                onclick="goAdmin()">Admin</button>
+        <button id="adminBtn" class="btn-outline-small" style="display:none;" onclick="goAdmin()">Admin</button>
         <button class="btn-outline-small" onclick="goHome()">Home</button>
         <button class="btn-small" onclick="logout()">Logout</button>
 
-        <!-- তিন ডট -->
         <button class="btn-outline-small menu-dot" id="menuToggle">⋮</button>
-
-        <!-- three-dot menu dropdown -->
         <div class="menu-dropdown" id="menuDropdown">
           <button type="button" onclick="goProfile()">Profile</button>
           <button type="button" onclick="goGenealogy()">Genealogy / Team</button>
+          <button type="button" onclick="goBTree()">Genealogy (B-Tree)</button>
           <button type="button" onclick="goIncomeHistory()">Income History</button>
-          <button type="button" onclick="goIncomeHistory()">tangation History</button>
+          <button type="button" onclick="goTxnHistory()">Transaction History</button>
         </div>
       </div>
     </header>
@@ -653,7 +324,7 @@
         <!-- NOTICE -->
         <div class="notice-wrap">
           <div class="notice-text" id="noticeText">
-            ⚠ Dashboard: all income / ROI / bonuses  for your bright life – instant withdraw USDT to your wallet.
+            ⚠ Dashboard: all income / ROI / bonuses for your bright life – instant withdraw USDT to your wallet.
           </div>
         </div>
 
@@ -664,9 +335,7 @@
             <span id="welcomeUser">@username</span>
             <div id="roleBadge"></div>
             <div class="member-status" id="memberStatus">Free Member</div>
-            <div class="member-status" id="memberStatus">Free Member</div>
             <div class="member-status" id="rankStatusText">Rank: -</div>
-
           </div>
           <div class="welcome-right">
             <div id="infoEmail"></div>
@@ -676,171 +345,124 @@
           </div>
         </div>
 
+        <!-- SMALL NOTES (moved up, compact) -->
+        <div class="mini-notes">
+          <div class="mini-pill" id="roiNoteTextMini">ROI: -</div>
+          <div class="mini-pill" id="capNoteTextMini">Capping: -</div>
+          <div class="mini-pill">Support: <span id="supportEmailText">support@example.com</span></div>
+          <div class="mini-pill">Telegram: <a id="teleLink" href="#" target="_blank">Telegram group</a></div>
+        </div>
+
         <!-- LIVE ACCOUNT SNAPSHOT -->
         <div class="live-snapshot">
           <div class="live-snapshot-header">
             <div class="live-snapshot-title">Live Account Snapshot</div>
-            <div class="live-snapshot-badge">Local data (demo)</div>
+            <div class="live-snapshot-badge" id="liveDataBadge">Local data (demo)</div>
           </div>
 
-          <div class="live-snapshot-row">
-            <span>Current Balance</span>
-            <span class="value" id="liveCurrentBal">$0.00</span>
-          </div>
-          <div class="live-snapshot-row">
-            <span>Current Earning</span>
-            <span class="value" id="liveCurrentEarn">$0.00</span>
-          </div>
-          <div class="live-snapshot-row">
-            <span>Self Investment</span>
-            <span class="value" id="liveSelfInv">$0.00</span>
-          </div>
-          <div class="live-snapshot-row">
-            <span>Team Size</span>
-            <span class="value" id="liveTeamSize">0 members</span>
-          </div>
-          <div class="live-snapshot-row">
-            <span>Total Earnings</span>
-            <span class="value" id="liveTotalEarn">$0.00</span>
-          </div>
+          <div class="live-snapshot-row"><span>Current Balance</span><span class="value" id="liveCurrentBal">$0.00</span></div>
+          <div class="live-snapshot-row"><span>Current Earning</span><span class="value" id="liveCurrentEarn">$0.00</span></div>
+          <div class="live-snapshot-row"><span>Self Investment</span><span class="value" id="liveSelfInv">$0.00</span></div>
+          <div class="live-snapshot-row"><span>Team Size</span><span class="value" id="liveTeamSize">0 members</span></div>
+          <div class="live-snapshot-row"><span>Total Earnings</span><span class="value" id="liveTotalEarn">$0.00</span></div>
         </div>
 
         <!-- SUMMARY CARDS -->
         <div class="summary-grid">
-          <div class="summary-card">
-            <p>Add Fubd Balance</p>
-            <h3 id="sumAddBalance">$0.00</h3>
-            <div class="summary-tag">For ID activation / package</div>
-          </div>
+          <div class="summary-card"><p>Add Fund Balance</p><h3 id="sumAddBalance">$0.00</h3><div class="summary-tag">For ID activation / package</div></div>
+          <div class="summary-card"><p>Current Earning</p><h3 id="sumCurrentEarn">$0.00</h3><div class="summary-tag">Earning wallet (all)</div></div>
+          <div class="summary-card"><p>Personal Investment</p><h3 id="sumSelf">$0.00</h3><div class="summary-tag">Your deposit</div></div>
+          <div class="summary-card"><p>Team Investment</p><h3 id="sumTeamInv">$0.00</h3><div class="summary-tag">Total team volume</div></div>
+          <div class="summary-card"><p>Sponsor Bonus</p><h3 id="sumDirect">$0.00</h3><div class="summary-tag">Direct referral</div></div>
+          <div class="summary-card"><p>Generation Bonus</p><h3 id="sumGen">$0.00</h3><div class="summary-tag">Level income</div></div>
+          <div class="summary-card"><p>Daily Profit (ROI)</p><h3 id="sumROI">$0.00</h3><div class="summary-tag">Per-day ROI only</div></div>
+          <div class="summary-card"><p>Rank Bonus</p><h3 id="sumRank">$0.00</h3><div class="summary-tag">Rank based bonus</div></div>
+          <div class="summary-card"><p>Global Sales Bonus</p><h3 id="sumGlobal">$0.00</h3><div class="summary-tag">Company global pool</div></div>
+          <div class="summary-card"><p>Gift Voucher</p><h3 id="sumGift">$0.00</h3><div class="summary-tag">Promo / coupon</div></div>
 
-          <div class="summary-card">
-            <p>Current Earning</p>
-            <h3 id="sumCurrentEarn">$0.00</h3>
-            <div class="summary-tag">Earning wallet (ROI + all)</div>
-          </div>
+          <div class="summary-card"><p>Total Investment</p><h3 id="sumTotalInv">$0.00</h3><div class="summary-tag">Self + team investment</div></div>
+          <div class="summary-card"><p>Total Earning</p><h3 id="sumTotal">$0.00</h3><div class="summary-tag">All income total</div></div>
 
-          <div class="summary-card">
-            <p>Personal Investment</p>
-            <h3 id="sumSelf">$0.00</h3>
-            <div class="summary-tag">Your deposit</div>
-          </div>
-
-          <div class="summary-card">
-            <p>Team Investment</p>
-            <h3 id="sumTeamInv">$0.00</h3>
-            <div class="summary-tag">Total team volume</div>
-          </div>
-
-          <div class="summary-card">
-            <p>Sponsor Bonus</p>
-            <h3 id="sumDirect">$0.00</h3>
-            <div class="summary-tag">Direct referral</div>
-          </div>
-
-          <div class="summary-card">
-            <p>Generation Bonus</p>
-            <h3 id="sumGen">$0.00</h3>
-            <div class="summary-tag">Level income</div>
-          </div>
-
-          <div class="summary-card">
-            <p>Daily Profit (ROI)</p>
-            <h3 id="sumROI">$0.00</h3>
-            <div class="summary-tag">Per-day ROI only</div>
-          </div>
-
-          <div class="summary-card">
-            <p>Rank Bonus</p>
-            <h3 id="sumRank">$0.00</h3>
-            <div class="summary-tag">Rank based bonus</div>
-          </div>
-
-          <div class="summary-card">
-            <p>Global Sales Bonus</p>
-            <h3 id="sumGlobal">$0.00</h3>
-            <div class="summary-tag">Company global pool</div>
-          </div>
-
-          <div class="summary-card">
-            <p>Gift Voucher</p>
-            <h3 id="sumGift">$0.00</h3>
-            <div class="summary-tag">Promo / coupon</div>
-          </div>
-
-          <div class="summary-card">
-            <p>Total Investment</p>
-            <h3 id="sumTotalInv">$0.00</h3>
-            <div class="summary-tag">Self + team investment</div>
-          </div>
-
-          <div class="summary-card">
-            <p>Total Earning</p>
-            <h3 id="sumTotal">$0.00</h3>
-            <div class="summary-tag">All income total</div>
+          <!-- ✅ NEW: Capping & Binary earning -->
+          <div class="summary-card gold-border">
+            <p>Capping / Binary Earning</p>
+            <h3 id="sumCappingEarn">$0.00</h3>
+            <div class="summary-tag">Capping used (All incomes)</div>
+            <div class="summary-tag" style="margin-top:6px;">Binary Match: <span id="sumBinaryEarn">$0.00</span></div>
           </div>
         </div>
 
-        <!-- REFERRAL SECTION -->
+        <!-- REFERRAL -->
         <div class="ref-card">
           <div class="ref-header">
             <div>
               <h3>My Referral Link</h3>
-              <span>Share this link. New members who register will have you as their sponsor.</span>
+              <span>Share this link. New members register with you as sponsor.</span>
             </div>
           </div>
           <div class="ref-body">
-            <div class="ref-input">
-              <input id="myRefLink" readonly />
-            </div>
+            <div class="ref-input"><input id="myRefLink" readonly /></div>
             <button class="ref-btn" onclick="copyRefLink()">Copy Link</button>
           </div>
         </div>
 
         <!-- ACTION BUTTONS -->
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
-          <button class="btn-outline-small" onclick="window.location.href='deposit.html'">
-            Deposit
-          </button>
-          <button class="btn-outline-small" onclick="window.location.href='upgrade.html'">
-            Upgrade / Invest
-          </button>
-          <button class="btn-outline-small" onclick="window.location.href='withdraw.html'">
-            Withdraw
-          </button>
+          <button class="btn-outline-small" onclick="window.location.href='deposit.html'">Deposit</button>
+          <button class="btn-outline-small" onclick="window.location.href='upgrade.html'">Upgrade / Invest</button>
+          <button class="btn-outline-small" onclick="window.location.href='withdraw.html'">Withdraw</button>
         </div>
 
-        <!-- ACCOUNT INFO + BAROMETER -->
+        <!-- ✅ PLAN + BINARY + RANK -->
+        <div class="info-grid">
+          <div class="info-card">
+            <h4>Active Plan / Package</h4>
+            <div class="info-row"><span>Plan Name</span><span id="planName">-</span></div>
+            <div class="info-row"><span>Plan Amount</span><span id="planAmount">$0.00</span></div>
+            <div class="info-row"><span>ROI % (Daily)</span><span id="planRoiPct">0%</span></div>
+            <div class="info-row"><span>Daily ROI</span><span id="planDailyRoi">$0.00</span></div>
+            <div class="info-row"><span>Status</span><span id="planStatus">Inactive</span></div>
+            <p class="note" id="planNoteText"></p>
+          </div>
+
+          <div class="info-card">
+            <h4>Binary Team (Left / Right)</h4>
+            <div class="info-row"><span>Left Members</span><span id="binLeftMembers">0</span></div>
+            <div class="info-row"><span>Right Members</span><span id="binRightMembers">0</span></div>
+            <div class="info-row"><span>Left Business</span><span id="binLeftBusiness">$0.00</span></div>
+            <div class="info-row"><span>Right Business</span><span id="binRightBusiness">$0.00</span></div>
+            <div class="info-row"><span>Left Carry</span><span id="binLeftCarry">$0.00</span></div>
+            <div class="info-row"><span>Right Carry</span><span id="binRightCarry">$0.00</span></div>
+            <div class="info-row"><span>Matching Income</span><span id="binMatchingIncome">$0.00</span></div>
+            <div class="info-row"><span>Today Match</span><span id="binTodayMatch">$0.00</span></div>
+            <p class="note">Carry stays on strong side. Matching happens when both sides have volume.</p>
+          </div>
+
+          <div class="info-card">
+            <h4>Rank & Target</h4>
+            <div class="info-row"><span>Current Rank</span><span id="rankName">-</span></div>
+            <div class="info-row"><span>Next Rank</span><span id="rankNext">-</span></div>
+            <div class="info-row"><span>Target Volume</span><span id="rankTarget">$0.00</span></div>
+            <div class="info-row"><span>Achieved</span><span id="rankAchieved">$0.00</span></div>
+            <div class="bar-progress"><div class="bar-progress-inner" id="rankProgressInner">0%</div></div>
+            <div class="info-row" style="margin-top:6px;"><span>Rank Bonus</span><span id="rankBonus">$0.00</span></div>
+          </div>
+        </div>
+
+        <!-- ACCOUNT DETAILS + 2 BAROMETER -->
         <div class="info-grid">
           <div class="info-card">
             <h4>Account Details</h4>
-            <div class="info-row">
-              <span>Full Name</span>
-              <span id="accName">-</span>
-            </div>
-            <div class="info-row">
-              <span>Username</span>
-              <span id="accUser">-</span>
-            </div>
-            <div class="info-row">
-              <span>Email</span>
-              <span id="accEmail">-</span>
-            </div>
-            <div class="info-row">
-              <span>Role</span>
-              <span id="accRole">-</span>
-            </div>
+            <div class="info-row"><span>Full Name</span><span id="accName">-</span></div>
+            <div class="info-row"><span>Username</span><span id="accUser">-</span></div>
+            <div class="info-row"><span>Email</span><span id="accEmail">-</span></div>
+            <div class="info-row"><span>Role</span><span id="accRole">-</span></div>
           </div>
 
           <div class="info-card">
             <h4>Network Info</h4>
-            <div class="info-row">
-              <span>Country</span>
-              <span id="accCountry">-</span>
-            </div>
-            <div class="info-row">
-              <span>Mobile</span>
-              <span id="accMobile">-</span>
-            </div>
+            <div class="info-row"><span>Country</span><span id="accCountry">-</span></div>
+            <div class="info-row"><span>Mobile</span><span id="accMobile">-</span></div>
             <div class="info-row">
               <span>Sponsor</span>
               <span class="copy-wrap">
@@ -848,76 +470,59 @@
                 <button type="button" class="copy-btn" onclick="copySponsorId()">Copy</button>
               </span>
             </div>
-            <div class="info-row">
-              <span>Joined</span>
-              <span id="accJoined">-</span>
-            </div>
+            <div class="info-row"><span>Joined</span><span id="accJoined">-</span></div>
           </div>
-          
 
-          <!-- 3X BAROMETER + ROI -->
+          <!-- ✅ ROI 3× BAROMETER (ROI only) -->
           <div class="info-card">
-            <h4>3× Return Barometer</h4>
+            <h4>3× ROI Return Barometer (ROI Only)</h4>
 
             <div class="bar-invest-grid">
-              <div class="mini-invest-card">
-                <p>Self Investment</p>
-                <h5 id="miniSelfInv">$0.00</h5>
-              </div>
-              <div class="mini-invest-card">
-                <p>Team Investment</p>
-                <h5 id="miniTeamInv">$0.00</h5>
-              </div>
-              <div class="mini-invest-card">
-                <p>Total Investment</p>
-                <h5 id="miniTotalInv">$0.00</h5>
-              </div>
+              <div class="mini-invest-card"><p>Self Investment</p><h5 id="miniSelfInv">$0.00</h5></div>
+              <div class="mini-invest-card"><p>Team Investment</p><h5 id="miniTeamInv">$0.00</h5></div>
+              <div class="mini-invest-card"><p>Total Investment</p><h5 id="miniTotalInv">$0.00</h5></div>
             </div>
 
             <div class="barometer-layout">
               <div class="barometer-left">
-                <div class="info-row">
-                  <span>Max Return (3×)</span>
-                  <span id="barMax">$0.00</span>
-                </div>
-                <div class="info-row">
-                  <span>Earned So Far</span>
-                  <span id="barUsed">$0.00</span>
-                </div>
-                <div class="info-row">
-                  <span>Remaining</span>
-                  <span id="barRemain">$0.00</span>
-                </div>
-                <div class="barometer-box">
-                  <div class="bar-progress">
-                    <div class="bar-progress-inner" id="barProgressInner">0%</div>
-                  </div>
-                </div>
+                <div class="info-row"><span>Max Return (3×)</span><span id="barMax">$0.00</span></div>
+                <div class="info-row"><span>ROI Earned</span><span id="barUsed">$0.00</span></div>
+                <div class="info-row"><span>ROI Remaining</span><span id="barRemain">$0.00</span></div>
+                <div class="bar-progress"><div class="bar-progress-inner" id="barProgressInner">0%</div></div>
               </div>
 
               <div class="bar-vertical-box">
-                <span>ROI Pool</span>
-                <div class="bar-vertical">
-                  <div class="bar-vertical-inner" id="roiVerticalInner">0%</div>
-                </div>
+                <span>ROI Left</span>
+                <div class="bar-vertical"><div class="bar-vertical-inner" id="roiVerticalInner">0%</div></div>
                 <span id="roiVerticalLabel">0% left</span>
               </div>
             </div>
+          </div>
+
+          <!-- ✅ TOTAL CAPPING BAROMETER (All incomes) -->
+          <div class="info-card">
+            <h4>3× Capping Barometer (All Income)</h4>
+            <div class="info-row"><span>Max Cap (3×)</span><span id="capMax">$0.00</span></div>
+            <div class="info-row"><span>Used (All incomes)</span><span id="capUsed">$0.00</span></div>
+            <div class="info-row"><span>Remaining</span><span id="capRemain">$0.00</span></div>
+            <div class="bar-progress"><div class="bar-progress-inner" id="capProgressInner">0%</div></div>
+            <p class="note" id="capWarnText"></p>
           </div>
         </div>
 
         <!-- CHARTS -->
         <div class="charts-grid">
           <div class="chart-card">
-            <h4>Income Breakdown (Demo)</h4>
+            <h4>Income Breakdown</h4>
             <canvas id="incomeChart"></canvas>
           </div>
           <div class="chart-card">
-            <h4>ROI Growth – 30 Days</h4>
+            <h4>ROI Growth – 30 Days (demo)</h4>
             <canvas id="roiChart"></canvas>
           </div>
         </div>
-                  <!-- TRANSACTION / INCOME HISTORY (Last 50) -->
+
+        <!-- HISTORY -->
         <section class="txn-card">
           <div class="txn-header-row">
             <h4>Transaction / Income History</h4>
@@ -929,6 +534,7 @@
                 <option value="roi">ROI</option>
                 <option value="sponsor">Sponsor</option>
                 <option value="generation">Generation</option>
+                <option value="matching">Matching</option>
                 <option value="rank">Rank</option>
                 <option value="global">Global</option>
                 <option value="gift">Gift</option>
@@ -953,444 +559,24 @@
           </table>
 
           <p class="note">
-            সব ধরণের ইনকাম / ট্রানজেকশন (ROI, Sponsor, Generation, Rank, Global, Gift ইত্যাদি) এখানে
-            আপনার username অনুযায়ী <strong>income_history</strong> collection থেকে দেখানো হবে।
+            income_history collection থেকে সব ইনকাম/ট্রানজেকশন এখানে দেখাবে (dashboard-txn.js চালু থাকলে)।
           </p>
         </section>
 
-        <!-- NOTES -->
-        <p class="note" id="roiNoteText"></p>
-        <p class="note" id="withdrawNoteText"></p>
-        <p class="note" id="supportLine">
-          Support: <span id="supportEmailText">support@example.com</span> •
-          Telegram: <a id="teleLink" href="#" target="_blank">Telegram group</a>
-        </p>
-        <p class="note">
-          ⚠ for you injoy only – connect real backend, wallet and packages before going live.
+        <p class="note" style="margin-top:10px;">
+          ⚠ Demo UI. Live করার আগে rules + income engine + withdrawal checks ঠিকভাবে connect করতে হবে।
         </p>
 
       </div>
     </section>
   </div>
-
-  <!-- INCOME ENGINE (optional – যদি থাকে) -->
+    <script type="module">
+  import { runBinaryForAllUsers, runDailyRoiForAllUsers } from "./income-engine.js";
+  </script>
+  <!-- Optional: if you already have it -->
   <script type="module" src="dashboard-txn.js"></script>
-  <script src="income-engine.js"></script>
 
-  <!-- MAIN DASHBOARD LOGIC (no module, pure JS) -->
-  <script>
-const STORAGE_CURRENT = "btx_current_user_v1";
-
-// ==== basic helpers ====
-function getCurrentUser(){
-  const raw = localStorage.getItem(STORAGE_CURRENT);
-  if(!raw) return null;
-  try{ return JSON.parse(raw); }catch(e){ return null; }
-}
-
-function logout(){
-  localStorage.removeItem(STORAGE_CURRENT);
-  alert("Logged out.");
-  window.location.href = "login.html";
-}
-
-function goHome(){ window.location.href = "index.html"; }
-function goAdmin(){ window.location.href = "admin.html"; }
-function goProfile(){ window.location.href = "profile.html"; }
-function goIncomeHistory(){ window.location.href = "income-history.html"; }
-function goGenealogy(){ window.location.href = "genealogy.html"; }
-
-function copyRefLink(){
-  const el = document.getElementById("myRefLink");
-  if(!el || !el.value){
-    alert("Referral link is empty.");
-    return;
-  }
-  el.select();
-  try{
-    document.execCommand("copy");
-    alert("Referral link copied!");
-  }catch(e){
-    alert("Copy is not supported – please select and copy manually.");
-  }
-}
-
-function fallbackCopy(text){
-  const tmp = document.createElement("textarea");
-  tmp.value = text;
-  document.body.appendChild(tmp);
-  tmp.select();
-  try{ document.execCommand("copy"); }catch(e){}
-  document.body.removeChild(tmp);
-  alert("Sponsor ID copied: " + text);
-}
-
-function copySponsorId(){
-  const el = document.getElementById("accSponsor");
-  if(!el || !el.textContent){
-    alert("No sponsor ID to copy.");
-    return;
-  }
-  const text = el.textContent.trim();
-  if(navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(text).then(()=>{
-      alert("Sponsor ID copied: " + text);
-    }).catch(()=>{
-      fallbackCopy(text);
-    });
-  }else{
-    fallbackCopy(text);
-  }
-}
-
-// তিন-ডট মেনু টগল
-const menuToggle   = document.getElementById("menuToggle");
-const menuDropdown = document.getElementById("menuDropdown");
-if(menuToggle && menuDropdown){
-  menuToggle.addEventListener("click", function(e){
-    e.stopPropagation();
-    menuDropdown.style.display =
-      (menuDropdown.style.display === "block" ? "none" : "block");
-  });
-  document.addEventListener("click", function(e){
-    if(!menuDropdown.contains(e.target) && e.target !== menuToggle){
-      menuDropdown.style.display = "none";
-    }
-  });
-}
-
-// global settings (localStorage থেকে)
-async function applyGlobalSettings(){
-  try{
-    const raw = localStorage.getItem("btx_global_settings_v1");
-    if(!raw) return;
-    const s = JSON.parse(raw);
-    const $ = id => document.getElementById(id);
-
-    if(s.siteTitle){
-      document.title = s.siteTitle + " – Member Dashboard";
-      const h1 = $("siteTitleHeading");
-      if(h1) h1.textContent = s.siteTitle;
-    }
-    if(s.dashboardTitle){
-      const p = $("dashTitleText");
-      if(p) p.textContent = s.dashboardTitle;
-    }
-    if(s.scalpText){
-      const n = $("noticeText");
-      if(n) n.textContent = s.scalpText;
-    }
-    if(s.roiNote){
-      const r = $("roiNoteText");
-      if(r) r.textContent = s.roiNote;
-    }
-    if(s.withdrawNote){
-      const w = $("withdrawNoteText");
-      if(w) w.textContent = s.withdrawNote;
-    }
-    if(s.supportEmail){
-      const se = $("supportEmailText");
-      if(se) se.textContent = s.supportEmail;
-    }
-    if(s.telegramLink){
-      const tl = $("teleLink");
-      if(tl) tl.href = s.telegramLink;
-    }
-  }catch(err){
-    console.error("Global settings load error:",err);
-  }
-}
-
-const fmt = v => "$" + Number(v||0).toFixed(2);
-
-// ==== main dashboard init ====
-(async function initDashboard(){
-  await applyGlobalSettings();
-
-  const user = getCurrentUser();
-  if(!user){
-    window.location.href = "login.html";
-    return;
-  }
-
-  // admin button
-  const adminBtn = document.getElementById("adminBtn");
-  if(user.role === "admin" && adminBtn){
-    adminBtn.style.display = "inline-flex";
-  }
-
-  const uName = user.username || "member";
-  const loginKey = "btx_login_count_" + uName;
-  const countRaw = localStorage.getItem(loginKey);
-  const count = countRaw ? parseInt(countRaw,10) : 0;
-
-  const welcomeTitle = (count > 0 ? "Welcome back, " : "Welcome, ");
-  document.getElementById("welcomeName").textContent =
-    welcomeTitle + (user.fullName || uName || "Member");
-  document.getElementById("welcomeUser").textContent =
-    "@" + (uName || "");
-  localStorage.setItem(loginKey, (count + 1).toString());
-
-  // badge
-  const roleBadge = document.getElementById("roleBadge");
-  if(user.role === "admin"){
-    roleBadge.innerHTML =
-      '<span class="badge-role">● ADMIN PANEL ACCESS</span>';
-  }else{
-    roleBadge.innerHTML =
-      '<span class="badge-role badge-member">● MEMBER ACCOUNT</span>';
-  }
-
-  // membership text
-  const membership = user.membershipType || "free";
-  document.getElementById("memberStatus").textContent =
-    (membership === "premium" ? "Premium Member" : "Free Member");
-
-  // top info
-  document.getElementById("infoEmail").textContent   = "Email: "   + (user.email   || "-");
-  document.getElementById("infoCountry").textContent = "Country: " + (user.country || "-");
-  document.getElementById("infoMobile").textContent  = "Mobile: "  + (user.mobile  || "-");
-  document.getElementById("infoSponsor").textContent = "Sponsor: " +
-    (user.sponsor_username || user.refCode || "N/A");
-
-  // account details
-  document.getElementById("accName").textContent    = user.fullName || "-";
-  document.getElementById("accUser").textContent    = uName || "-";
-  document.getElementById("accEmail").textContent   = user.email || "-";
-  document.getElementById("accRole").textContent    = (user.role === "admin" ? "Admin" : "Member");
-  document.getElementById("accCountry").textContent = user.country || "-";
-  document.getElementById("accMobile").textContent  = user.mobile || "-";
-  document.getElementById("accSponsor").textContent =
-    user.sponsor_username || user.refCode || "-";
-
-  if(user.createdAt){
-    try{
-      const d = new Date(user.createdAt);
-      document.getElementById("accJoined").textContent = d.toLocaleString();
-    }catch(e){
-      document.getElementById("accJoined").textContent = "-";
-    }
-  }
-
-  // referral link
-  const refLink =
-    window.location.origin +
-    "/register-neon.html?ref=" +
-    encodeURIComponent(uName || "");
-  document.getElementById("myRefLink").value = refLink;
-
-  // ==== SUMMARY CALC – সবকিছু Firestore user থেকে ====
-  const selfInv      = Number(user.depositTotal      || 0);
-  const teamInv      = Number(user.teamInvestment    || 0);
-  const dailyROI     = Number(user.dailyROI          || 0);
-
-  const sponsorBonus = Number(user.directIncome      || 0);
-  const genBonus     = Number(user.teamIncome        || 0);
-  const rankBonus    = Number(user.rankIncome        || 0);
-  const globalBonus  = Number(user.globalIncome      || 0);
-  const giftVoucher  = Number(user.giftVoucher       || 0);
-
-  const earningBal   = Number(user.earningBalance    || 0);
-  const addBal       = Number(user.addBalance || user.balance || 0);
-  const roiEarned    = Number(user.roiEarned         || 0);
-
-  // ✅ Total earning: সব ইনকামের সমষ্টি (Sponsor সহ)
-  const totalEarn =
-    sponsorBonus +
-    genBonus +
-    rankBonus +
-    globalBonus +
-    giftVoucher +
-    roiEarned;
-
-  // ✅ 3× barometer শুধু ROI earned দিয়ে
-  const barMax    = selfInv * 3;
-  const barUsed   = roiEarned;
-  const barRemain = Math.max(0, barMax - barUsed);
-  const barPct    = barMax > 0 ? Math.min(100,(barUsed/barMax)*100) : 0;
-
-  const summary = {
-    selfInvestment: selfInv,
-    teamInvestment: teamInv,
-    totalInvestment: selfInv + teamInv,
-    dailyROI: dailyROI,
-    roiEarned: roiEarned,
-    sponsorBonus: sponsorBonus,
-    genBonus: genBonus,
-    rankBonus: rankBonus,
-    globalBonus: globalBonus,
-    giftVoucher: giftVoucher,
-    addBalance: addBal,
-    earningBalance: earningBal,
-    totalEarning: totalEarn,
-    barMax, barUsed, barRemain, barUsedPercent: barPct
-  };
-
-  // ==== Summary cards ====
-  document.getElementById("sumAddBalance").textContent   = fmt(summary.addBalance);
-  document.getElementById("sumTeamInv").textContent      = fmt(summary.teamInvestment);
-  document.getElementById("sumTotalInv").textContent     = fmt(summary.totalInvestment);
-  document.getElementById("sumCurrentEarn").textContent  = fmt(summary.earningBalance);
-
-  document.getElementById("miniSelfInv").textContent  = fmt(summary.selfInvestment);
-  document.getElementById("miniTeamInv").textContent  = fmt(summary.teamInvestment);
-  document.getElementById("miniTotalInv").textContent = fmt(summary.totalInvestment);
-
-  document.getElementById("sumSelf").textContent    = fmt(summary.selfInvestment);
-  document.getElementById("sumROI").textContent     = fmt(summary.dailyROI);
-  document.getElementById("sumDirect").textContent  = fmt(summary.sponsorBonus);
-  document.getElementById("sumGen").textContent     = fmt(summary.genBonus);
-  document.getElementById("sumRank").textContent    = fmt(summary.rankBonus);
-  document.getElementById("sumGlobal").textContent  = fmt(summary.globalBonus);
-  document.getElementById("sumGift").textContent    = fmt(summary.giftVoucher);
-  document.getElementById("sumTotal").textContent   = fmt(summary.totalEarning);
-
-  // ==== Live snapshot ====
-  const liveBal   = document.getElementById("liveCurrentBal");
-  const liveEarn  = document.getElementById("liveCurrentEarn");
-  const liveSelf  = document.getElementById("liveSelfInv");
-  const liveTeam  = document.getElementById("liveTeamSize");
-  const liveTotal = document.getElementById("liveTotalEarn");
-
-  // ✅ Team size – যেটা আছে: teamCount / teamSize / totalTeam
-  const teamSize = Number(user.teamCount || user.teamSize || user.totalTeam || 0);
-
-  if(liveBal)   liveBal.textContent   = fmt(summary.addBalance);
-  if(liveEarn)  liveEarn.textContent  = fmt(summary.earningBalance);
-  if(liveSelf)  liveSelf.textContent  = fmt(summary.selfInvestment);
-  if(liveTeam)  liveTeam.textContent  =
-    teamSize + " member" + (teamSize === 1 ? "" : "s");
-  if(liveTotal) liveTotal.textContent = fmt(summary.totalEarning);
-
-  // ==== 3× barometer UI ====
-  document.getElementById("barMax").textContent    = fmt(barMax);
-  document.getElementById("barUsed").textContent   = fmt(barUsed);
-  document.getElementById("barRemain").textContent = fmt(barRemain);
-
-  const bp = document.getElementById("barProgressInner");
-  if (bp){
-    bp.style.width  = barPct + "%";
-    bp.textContent  = barPct.toFixed(1) + "% used";
-  }
-
-  const rv      = document.getElementById("roiVerticalInner");
-  const rvLabel = document.getElementById("roiVerticalLabel");
-
-  let roiRemainPct = 0;
-  if (barMax > 0){
-    roiRemainPct = Math.max(0, Math.min(100, (barRemain / barMax) * 100));
-  }
-  if (rv){
-    rv.style.height = roiRemainPct + "%";
-    rv.textContent  = roiRemainPct.toFixed(1) + "%";
-  }
-  if (rvLabel){
-    rvLabel.textContent = roiRemainPct.toFixed(1) + "% left";
-  }
-
-  // ==== ROI note ====
-  const roiNoteEl = document.getElementById("roiNoteText");
-  const daily = Number(summary.dailyROI || 0);
-  if(roiNoteEl){
-    let extra = "";
-    if(summary.selfInvestment > 0){
-      extra += "Your self investment: " + fmt(summary.selfInvestment) +
-               " → 3× max return: " + fmt(barMax) + ". ";
-    }
-    if(daily > 0){
-      const remain = barRemain;
-      const approxDays = remain>0 ? Math.ceil(remain/daily) : 0;
-      extra += "Daily ROI now: " + fmt(daily) +
-               " per day. At this rate you can finish the remaining " +
-               fmt(remain) + " in about " + approxDays + " day(s), if only ROI is counted.";
-    }else{
-      extra += "Daily ROI is 0. When admin sets ROI% and you activate a package, daily ROI will start and reduce the 3× barometer every day.";
-    }
-    roiNoteEl.textContent = roiNoteEl.textContent
-      ? roiNoteEl.textContent + " " + extra
-      : extra;
-  }
-
-  // ==== Chart 1 – income breakdown ====
-  const ctx1 = document.getElementById("incomeChart").getContext("2d");
-  new Chart(ctx1,{
-    type:"bar",
-    data:{
-      labels:["Self Inv","Daily ROI","Sponsor","Generation","Rank","Global","Gift"],
-      datasets:[{
-        label:"USDT",
-        data:[
-          summary.selfInvestment,
-          summary.dailyROI,
-          summary.sponsorBonus,
-          summary.genBonus,
-          summary.rankBonus,
-          summary.globalBonus,
-          summary.giftVoucher
-        ]
-      }]
-    },
-    options:{
-      plugins:{legend:{display:false}},
-      scales:{
-        x:{ticks:{color:"#e5f0ff"}},
-        y:{ticks:{color:"#e5f0ff"}}
-      }
-    }
-  });
-
-  // ==== Chart 2 – ROI growth demo ====
-  const days = [];
-  const roiValues = [];
-  let capRemain = barRemain;
-  let cumulative = roiEarned;
-  const dailyOnly = dailyROI;
-
-  for(let i=1;i<=30;i++){
-    let todayRoi = dailyOnly;
-    if(capRemain<=0) todayRoi = 0;
-    if(todayRoi > capRemain) todayRoi = capRemain;
-    capRemain -= todayRoi;
-    cumulative += todayRoi;
-    days.push(i.toString());
-    roiValues.push(cumulative.toFixed(2));
-  }
-
-  const ctx2 = document.getElementById("roiChart").getContext("2d");
-  new Chart(ctx2,{
-    type:"line",
-    data:{
-      labels:days,
-      datasets:[{
-        label:"Cumulative ROI (only ROI)",
-        data:roiValues,
-        tension:0.3
-      }]
-    },
-    options:{
-      plugins:{legend:{display:false}},
-      scales:{
-        x:{ticks:{color:"#e5f0ff"}},
-        y:{ticks:{color:"#e5f0ff"}}
-      }
-    }
-  });
-
-})();
-
-// global functions for onclick
-window.logout          = logout;
-window.goHome          = goHome;
-window.goAdmin         = goAdmin;
-window.goProfile       = goProfile;
-window.goGenealogy     = goGenealogy;
-window.goIncomeHistory = goIncomeHistory;
-window.copyRefLink     = copyRefLink;
-window.copySponsorId   = copySponsorId;
-</script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="income-engine.js"></script>
-<script src="dashboard.js"></script>
-<script type="module" src="dashboard-txn.js"></script>
+  <!-- MAIN JS -->
+  <script src="dashboard.js"></script>
 </body>
 </html>

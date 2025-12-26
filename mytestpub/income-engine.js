@@ -1,29 +1,33 @@
-/********************
- * BTX.ONE – Income Engine (v2)
- * -----------------------------------------
- * - সব কম্পেনসেশন / ROI হিসাব এখানে হবে
- * - কাজ করবে pure localStorage এর উপর
- * - users key:  "btx_users_v1"
- *
- * এই ফাইলটা রাখো:  public/income-engine.js
- ********************/
+// /public/income-engine.js
+// BTX.ONE — FINAL INCOME ENGINE (FIRESTORE ONLY)
+// ✅ Single source of truth for ALL incomes
+// ✅ Premium only income
+// ✅ 3X cap applies to ALL income types
+// ✅ income_history logging
+// ✅ Admin runnable: ROI + Binary
+// ✅ Upgrade hook: sponsor + generation + binary volume build
 
-// ---------- CONSTANTS ----------
-const IE_STORAGE_USERS = "btx_users_v1";
+import { db } from "./firebase-config.js";
+import {
+  doc, getDoc, setDoc, updateDoc, getDocs,
+  collection, addDoc,
+  serverTimestamp, increment
+} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-// প্ল্যান কনফিগ – Admin panel থেকে future এ dynamic করা যাবে
-const IE_PLAN = {
-  // ROI
-  roiPercentPerDay: 1.2,   // প্রতিদিন ROI %, উদাহরণ: 1–1.5%
+/* ==============================
+   CONFIG / PLAN
+================================ */
 
-  // Direct sponsor % (deposit এর উপর একবার)
+const PLAN_REF = doc(db, "config", "plan");
+
+const DEFAULT_PLAN = {
+  earningMultiplier: 3,          // 3X
+  capExcludeTypes: [],           // [] => সব টাইপ cap এ গণনা হবে
+  roiEnabled: true,
+  roiPercentPerDay: 10,
+  sponsorEnabled: true,
   sponsorPercent: 5,
-
-  // 20 level generation বোর্ড – তুমি আগেই যেটা ঠিক করেছো
-  // percent গুলোর sum ~100 হলে ভালো হয়
-
-
-  console.log("BUILD:", "20251217_1");
+  generationEnabled: true,
   genLevels: [
     { level: 1,  percent: 20, reqDirect: 1 },
     { level: 2,  percent: 10, reqDirect: 2 },
@@ -46,659 +50,343 @@ const IE_PLAN = {
     { level:19,  percent:  1, reqDirect:19 },
     { level:20,  percent:  1, reqDirect:20 },
   ],
-
-  // Gift voucher কমিশন (deposit এর উপর নিজের জন্য)
-  giftVoucherPercent: 1,
-
-  // 3X barometer – মোট earning (ROI + Affiliate) <= selfDeposit * 3
-  maxMultiple: 3,
-
-  // ROI এর উপর affiliate pool – 100% মানে
-  // নিজে যত ROI পাবে, network মোটেও তত পাবে (20 level এ ভাগ হয়ে যাবে)
-  roiAffiliateMultiplier: 1   // 1x = 100%
+  rankEnabled: true,
+  globalEnabled: true,
+  binaryEnabled: true,
+  binaryPercent: 10
 };
 
-// ---------- Basic helpers ----------
-function ieLoadUsers(){
-  const raw = localStorage.getItem(IE_STORAGE_USERS);
-  if (!raw) return [];
-  try { return JSON.parse(raw); }
-  catch(e){ return []; }
-}
-
-function ieSaveUsers(list){
-  localStorage.setItem(IE_STORAGE_USERS, JSON.stringify(list || []));
-}
-
-function ieFindUser(username, users){
-  const uName = (username || "").toLowerCase();
-  return users.find(u => (u.username || "").toLowerCase() === uName) || null;
-}
-
-/**
- * সব income / wallet field safe করে সেট করে দেই
- */
-function ieEnsureIncomeFields(u){
-  if (!u) return;
-
-  // Investment
-  u.depositTotal     = Number(u.depositTotal     || 0); // self investment
-  u.packageAmount    = Number(u.packageAmount    || 0); // active package
-  u.totalInvestment  = Number(u.totalInvestment  || u.depositTotal || 0); // self-এর total
-  u.teamInvestment   = Number(u.teamInvestment   || 0); // team-এর investment
-
-  // Wallets
-  u.addBalance       = Number(u.addBalance       || 0); // Add balance / current balance
-  u.earningBalance   = Number(u.earningBalance   || 0); // ROI + সকল income (withdraw wallet)
-  u.voucherBalance   = Number(u.voucherBalance   || 0); // Gift voucher wallet
-
-  // Income breakdown
-  u.directIncome     = Number(u.directIncome     || 0);
-  u.teamIncome       = Number(u.teamIncome       || 0); // এখানে generation income রাখবো
-  u.rankIncome       = Number(u.rankIncome       || 0);
-  u.globalIncome     = Number(u.globalIncome     || 0);
-  u.giftVoucherIncome= Number(u.giftVoucherIncome|| 0);
-
-  // ROI
-  u.dailyROI         = Number(u.dailyROI         || 0); // ১ দিনের ROI (today base)
-  u.roiEarned        = Number(u.roiEarned        || 0); // এখন পর্যন্ত মোট ROI
-
-  // Misc
-  u.directCount      = Number(u.directCount      || u.teamCount || 0); // পুরনো teamCount holeo নেবে
-}
-
-/**
- * মোট income – 3X barometer হিসাবের জন্য
- * এখানে শুধু earning type গুলো count হবে, deposit / transfer না
- */
-function ieTotalIncome(u){
-  ieEnsureIncomeFields(u);
-  return (
-    (u.directIncome       || 0) +
-    (u.teamIncome         || 0) +
-    (u.rankIncome         || 0) +
-    (u.globalIncome       || 0) +
-    (u.giftVoucherIncome  || 0) +
-    (u.roiEarned          || 0)
-  );
-}
-
-/**
- * 3X barometer helper
- */
-function ieBarometer(u){
-  ieEnsureIncomeFields(u);
-  const selfDep = u.depositTotal || 0;
-  const max     = selfDep * IE_PLAN.maxMultiple;
-  const used    = ieTotalIncome(u);
-  const remain  = Math.max(0, max - used);
-  const usedPct = max > 0 ? Math.min(100, (used / max) * 100) : 0;
-  return {
-    max, used, remain,
-    usedPercent: Number(usedPct.toFixed(2))
-  };
-}
-
-// ---------- Team Investment (self + team) ----------
-
-/**
- * পুরো tree থেকে teamInvestment + totalInvestment refresh করবে
- * (admin পেজ থেকে manual একটা button দিয়ে call করতে পারো)
- */
-function ieRecalcTeamAndTotals(){
-  const users = ieLoadUsers();
-  const byName = {};
-  users.forEach(u => {
-    ieEnsureIncomeFields(u);
-    if (u.username){
-      byName[String(u.username).toLowerCase()] = u;
-    }
-    // reset
-    u.teamInvestment  = 0;
-    u.totalInvestment = u.depositTotal || 0;
-  });
-
-  users.forEach(member => {
-    const dep = member.depositTotal || 0;
-    let sponsor = (member.sponsor_username || "").toLowerCase();
-    while (sponsor){
-      const up = byName[sponsor];
-      if (!up) break;
-      up.teamInvestment += dep;
-      sponsor = (up.sponsor_username || "").toLowerCase();
-    }
-  });
-
-  ieSaveUsers(users);
-  return users;
-}
-
-// ---------- Package activation (deposit + affiliate on deposit) ----------
-
-/**
- * কোন member যখন package নিবে (deposit সফল হবে),
- * তখন admin panel / script থেকে call করবে:
- *   ieActivatePackage("username", 200);
- *
- * এটা শুধু LOCAL data update করবে (btx_users_v1)
- */
-function ieActivatePackage(username, amount){
-  amount = Number(amount || 0);
-  if (!username || amount <= 0){
-    alert("Package activate করতে username এবং amount দরকার।");
-    return;
-  }
-
-  const users  = ieLoadUsers();
-  const member = ieFindUser(username, users);
-  if (!member){
-    alert("Member পাওয়া যায়নি: " + username);
-    return;
-  }
-
-  ieEnsureIncomeFields(member);
-
-  // --- self investment update ---
-  member.depositTotal    += amount;
-  member.packageAmount   += amount;
-  member.totalInvestment = member.depositTotal;
-
-  // ROI per day update – প্রতি দিন একই rate এ যাবে
-  member.dailyROI = member.packageAmount * IE_PLAN.roiPercentPerDay / 100;
-
-  // ---------- Direct sponsor (deposit এর উপর একবার) ----------
-  if (member.sponsor_username){
-    const sp = ieFindUser(member.sponsor_username, users);
-    if (sp){
-      ieEnsureIncomeFields(sp);
-      const spIncRaw = amount * IE_PLAN.sponsorPercent / 100;
-
-      // 3X cap respect (sponsor)
-      const cap   = (sp.depositTotal || 0) * IE_PLAN.maxMultiple;
-      const used  = ieTotalIncome(sp);
-      const room  = Math.max(0, cap - used);
-      const spInc = Math.min(room, spIncRaw);
-
-      sp.directIncome   += spInc;
-      sp.earningBalance += spInc;
-    }
-  }
-
-  // ---------- Generation bonus (deposit এর উপর) ----------
-  let uplineName = member.sponsor_username || "";
-  for (let i = 0; i < IE_PLAN.genLevels.length; i++){
-    if (!uplineName) break;
-    const levelConf = IE_PLAN.genLevels[i];
-    const up        = ieFindUser(uplineName, users);
-    if (!up) break;
-
-    ieEnsureIncomeFields(up);
-    const directCount = up.directCount || 0;
-
-    if (directCount >= levelConf.reqDirect){
-      const genRaw = amount * levelConf.percent / 100;
-
-      const cap   = (up.depositTotal || 0) * IE_PLAN.maxMultiple;
-      const used  = ieTotalIncome(up);
-      const room  = Math.max(0, cap - used);
-      const genInc = Math.min(room, genRaw);
-
-      up.teamIncome     += genInc;
-      up.earningBalance += genInc;
-    }
-
-    uplineName = up.sponsor_username || "";
-  }
-
-  // ---------- Gift voucher (deposit এর উপর নিজের জন্য) ----------
-  const giftRaw = amount * IE_PLAN.giftVoucherPercent / 100;
-  const capSelf = (member.depositTotal || 0) * IE_PLAN.maxMultiple;
-  const usedSelf= ieTotalIncome(member);
-  const roomSelf= Math.max(0, capSelf - usedSelf);
-  const giftInc = Math.min(roomSelf, giftRaw);
-
-  member.giftVoucherIncome += giftInc;
-  member.earningBalance    += giftInc;
-  member.voucherBalance    += giftInc; // চাইলে শুধু gift wallet এ রাখবে
-
-  ieSaveUsers(users);
-  alert("✅ Package activation income হিসাব হয়ে গেল (local data)।");
-}
-
-// ---------- Daily ROI + ROI based affiliate ----------
-
-/**
- * daily ROI + 100% affiliate:
- *
- * উদাহরণ:
- *   self deposit = 1000
- *   ROI% = 1% → আজকের self ROI = 10
- *   roiAffiliateMultiplier = 1 → affiliate pool = 10
- *   মোট payout আজকের জন্য = 20
- *
- * 3X barometer সব জায়গায় respect করা হয়েছে।
- */
-function ieDistributeRoiAffiliate(users, member, roiAmount){
-  if (!roiAmount || roiAmount <= 0) return;
-
-  let uplineName = member.sponsor_username || "";
-  const pool     = roiAmount * IE_PLAN.roiAffiliateMultiplier;
-
-  for (let i = 0; i < IE_PLAN.genLevels.length; i++){
-    if (!uplineName) break;
-    const conf = IE_PLAN.genLevels[i];
-    const up   = ieFindUser(uplineName, users);
-    if (!up) break;
-
-    ieEnsureIncomeFields(up);
-
-    const directCount = up.directCount || 0;
-    if (directCount >= conf.reqDirect){
-      const genRaw  = pool * conf.percent / 100;
-      const cap     = (up.depositTotal || 0) * IE_PLAN.maxMultiple;
-      const used    = ieTotalIncome(up);
-      const room    = Math.max(0, cap - used);
-      const genInc  = Math.min(room, genRaw);
-
-      up.teamIncome     += genInc;
-      up.earningBalance += genInc;
-    }
-
-    uplineName = up.sponsor_username || "";
-  }
-}
-
-/**
- * ১ দিনের ROI + affiliate run করবে সব active package এর জন্য
- * তুমি চাইলে admin panel থেকে "Run Today ROI" বাটনে এটা call করতে পারো।
- */
-function runDailyRoi(){
-  const users = ieLoadUsers();
-
-  users.forEach(u => {
-    ieEnsureIncomeFields(u);
-    if (!u.dailyROI || u.dailyROI <= 0) return;
-
-    const cap   = (u.depositTotal || 0) * IE_PLAN.maxMultiple;
-    const used  = ieTotalIncome(u);
-    const room  = Math.max(0, cap - used);
-    if (room <= 0) return; // already 3x done
-
-    // আজকের self ROI
-    let roiToday = u.dailyROI;
-    if (roiToday > room) roiToday = room;
-
-    // self income
-    u.roiEarned      += roiToday;
-    u.earningBalance += roiToday;
-
-    // affiliate part
-    ieDistributeRoiAffiliate(users, u, roiToday);
-  });
-
-  ieSaveUsers(users);
-  alert("📅 আজকের ROI + Affiliate হিসাব করা হয়েছে (localStorage)।");
-}
-
-// পুরনো নামের সাথে compat রাখার জন্য (যদি কোথাও ব্যবহার করে থাকো)
-function runDailyRoiDemo(){
-  return runDailyRoi();
-}
-
-// ---------- Wallet transfer helpers ----------
-
-/**
- * Admin → gift voucher
- */
-function ieAdminSendVoucher(username, amount){
-  amount = Number(amount || 0);
-  if (!username || amount <= 0){
-    alert("Gift voucher পাঠাতে username এবং amount দরকার।");
-    return;
-  }
-  const users  = ieLoadUsers();
-  const member = ieFindUser(username, users);
-  if (!member){
-    alert("Member পাওয়া যায়নি: " + username);
-    return;
-  }
-  ieEnsureIncomeFields(member);
-  member.voucherBalance += amount;
-  ieSaveUsers(users);
-  alert("🎁 Gift voucher balance add হয়েছে।");
-}
-
-/**
- * Voucher → Add balance / Earning balance
- * type: "add" | "earning"
- */
-function ieVoucherConvert(username, amount, type){
-  amount = Number(amount || 0);
-  const validType = type === "add" ? "add" : (type === "earning" ? "earning" : null);
-  if (!username || amount <= 0 || !validType){
-    alert("Voucher convert এর ইনপুট সঠিক না।");
-    return;
-  }
-
-  const users  = ieLoadUsers();
-  const member = ieFindUser(username, users);
-  if (!member){
-    alert("Member পাওয়া যায়নি: " + username);
-    return;
-  }
-  ieEnsureIncomeFields(member);
-  if (member.voucherBalance < amount){
-    alert("Voucher balance কম।");
-    return;
-  }
-
-  member.voucherBalance -= amount;
-  if (validType === "add"){
-    member.addBalance += amount;
-  }else{
-    member.earningBalance += amount;
-  }
-  ieSaveUsers(users);
-  alert("✅ Voucher convert করা হয়েছে।");
-}
-
-/**
- * Earning → Current/Add balance (শুধু ID activation / package এর জন্য)
- */
-function ieEarningToAddBalance(username, amount){
-  amount = Number(amount || 0);
-  if (!username || amount <= 0){
-    alert("Transfer এর ইনপুট সঠিক না।");
-    return;
-  }
-  const users  = ieLoadUsers();
-  const member = ieFindUser(username, users);
-  if (!member){
-    alert("Member পাওয়া যায়নি: " + username);
-    return;
-  }
-  ieEnsureIncomeFields(member);
-  if (member.earningBalance < amount){
-    alert("Earning balance কম।");
-    return;
-  }
-  member.earningBalance -= amount;
-  member.addBalance     += amount;
-  ieSaveUsers(users);
-  alert("🔁 Earning থেকে current balance এ নেয়া হয়েছে (activation এর জন্য)।");
-}
-
-// ---------- Dashboard summary helper ----------
-
-/**
- * getIncomeSummary(username)
- * – চাইলে dashboard এ ব্যবহার করতে পারো
- */
-function getIncomeSummary(username){
-  const users  = ieLoadUsers();
-  const member = ieFindUser(username, users);
-  if (!member) return null;
-  ieEnsureIncomeFields(member);
-
-  const total     = ieTotalIncome(member);
-  const bar       = ieBarometer(member);
-
-  return {
-    // investment
-    selfInvestment:  member.depositTotal    || 0,
-    teamInvestment:  member.teamInvestment  || 0,
-    totalInvestment: (member.depositTotal   || 0) + (member.teamInvestment || 0),
-
-    // ROI
-    dailyROI:        member.dailyROI        || 0,
-    roiEarned:       member.roiEarned       || 0,
-
-    // income breakdown
-    sponsorBonus:    member.directIncome        || 0,
-    genBonus:        member.teamIncome          || 0,
-    rankBonus:       member.rankIncome          || 0,
-    globalBonus:     member.globalIncome        || 0,
-    giftVoucher:     member.giftVoucherIncome   || 0,
-
-    // wallet
-    addBalance:      member.addBalance      || 0,
-    earningBalance:  member.earningBalance  || 0,
-    voucherBalance:  member.voucherBalance  || 0,
-    currentBalance:  member.addBalance      || 0, // পুরনো নামের সাথে match করার জন্য
-    totalEarning:    total,
-
-    // barometer 3x
-    barMax:          bar.max,
-    barUsed:         bar.used,
-    barRemain:       bar.remain,
-    barUsedPercent:  bar.usedPercent
-  };
-}
-
-// Export to global (যদি module system ছাড়া ব্যবহার করো)
-window.ieActivatePackage      = ieActivatePackage;
-window.runDailyRoi            = runDailyRoi;
-window.runDailyRoiDemo        = runDailyRoiDemo;
-window.ieRecalcTeamAndTotals  = ieRecalcTeamAndTotals;
-window.ieAdminSendVoucher     = ieAdminSendVoucher;
-window.ieVoucherConvert       = ieVoucherConvert;
-window.ieEarningToAddBalance  = ieEarningToAddBalance;
-window.getIncomeSummary       = getIncomeSummary;
-window.ieBarometer            = ieBarometer;
-// income-engine.js (FINAL) — single source of truth for all incomes
-
-import { db } from "./firebase-config.js";
-import {
-  doc, getDoc, updateDoc, setDoc,
-  collection, addDoc, serverTimestamp,
-  increment
-} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-
-const PLAN_REF = doc(db, "config", "plan");
-
-async function getPlan(){
-  const s = await getDoc(PLAN_REF);
-  const p = s.exists() ? s.data() : {};
-  return {
-    earningMultiplier: Number(p.earningMultiplier ?? 3),
-    capExcludeTypes: Array.isArray(p.capExcludeTypes) ? p.capExcludeTypes : ["roi"],
-    roiEnabled: p.roiEnabled !== false,
-    sponsorEnabled: p.sponsorEnabled !== false,
-    generationEnabled: p.generationEnabled !== false,
-    rankEnabled: p.rankEnabled !== false,
-    globalEnabled: p.globalEnabled !== false
-  };
-}
-
+function n(v){ return Number(v || 0); }
 function normType(t){ return (t || "").toLowerCase().trim(); }
 
-// ✅ PUBLIC: recalculates earningCap from depositTotal * multiplier
+export async function getPlan(){
+  const s = await getDoc(PLAN_REF);
+  const p = s.exists() ? s.data() : {};
+  const plan = { ...DEFAULT_PLAN, ...p };
+
+  plan.earningMultiplier = n(plan.earningMultiplier || 3);
+  plan.capExcludeTypes = Array.isArray(plan.capExcludeTypes) ? plan.capExcludeTypes : [];
+  plan.roiPercentPerDay = n(plan.roiPercentPerDay || 10);
+  plan.sponsorPercent = n(plan.sponsorPercent || 5);
+  plan.binaryPercent = n(plan.binaryPercent || 10);
+  plan.genLevels = Array.isArray(plan.genLevels) && plan.genLevels.length
+    ? plan.genLevels
+    : DEFAULT_PLAN.genLevels;
+
+  return plan;
+}
+
+/* ==============================
+   CAP HELPERS
+================================ */
+
 export async function ensureEarningCap(username){
-  const uRef = doc(db, "users", username.toLowerCase());
+  username = (username || "").toLowerCase().trim();
+  if(!username) return;
+
+  const uRef = doc(db, "users", username);
   const uSnap = await getDoc(uRef);
   if(!uSnap.exists()) return;
 
   const plan = await getPlan();
   const u = uSnap.data();
 
-  const deposit = Number(u.depositTotal || 0);
+  const deposit = n(u.depositTotal);
   const cap = deposit * plan.earningMultiplier;
 
-  // earningCap না থাকলে বা deposit বদলালে আপডেট
   await setDoc(uRef, { earningCap: cap }, { merge: true });
 }
 
-// ✅ FINAL: credit income with strict premium rule + cap + history
-export async function creditIncome(username, amount, type, remark=""){
-  username = (username || "").toLowerCase();
+function isPremium(u){
+  return String(u?.membershipType || "free").toLowerCase() === "premium";
+}
+
+function capInfo(u, plan){
+  const deposit = n(u.depositTotal);
+  const cap = n(u.earningCap ?? (deposit * plan.earningMultiplier));
+  const used = n(u.earningUsed);
+  const left = cap > 0 ? Math.max(0, cap - used) : 0;
+  return { deposit, cap, used, left };
+}
+
+/* ==============================
+   HISTORY LOGGER
+================================ */
+
+async function logHistory({ username, type, amount, remark = "", day = "" }){
+  await addDoc(collection(db, "income_history"), {
+    username: (username || "").toLowerCase(),
+    type: normType(type),
+    amount: n(amount),
+    remark: remark || "",
+    day: day || "",
+    createdAt: serverTimestamp()
+  });
+}
+
+/* ==============================
+   CREDIT INCOME (FINAL)
+================================ */
+
+export async function creditIncome(username, amount, type, remark = ""){
+  username = (username || "").toLowerCase().trim();
   type = normType(type);
+
+  const inc = n(amount);
+  if(!username) return { ok:false, reason:"missing_username" };
+  if(inc <= 0) return { ok:false, reason:"invalid_amount" };
 
   const plan = await getPlan();
 
-  // feature toggles
-  if(type === "roi" && !plan.roiEnabled) return { ok:false, reason:"ROI disabled" };
-  if((type === "sponsor" || type === "direct") && !plan.sponsorEnabled) return { ok:false, reason:"Sponsor disabled" };
-  if((type === "generation" || type === "gen") && !plan.generationEnabled) return { ok:false, reason:"Gen disabled" };
-  if(type === "rank" && !plan.rankEnabled) return { ok:false, reason:"Rank disabled" };
-  if(type === "global" && !plan.globalEnabled) return { ok:false, reason:"Global disabled" };
-
-  const inc = Number(amount || 0);
-  if(!inc || inc <= 0) return { ok:false, reason:"Invalid amount" };
+  if(type === "roi" && !plan.roiEnabled) return { ok:false, reason:"roi_disabled" };
+  if((type === "sponsor" || type === "direct") && !plan.sponsorEnabled) return { ok:false, reason:"sponsor_disabled" };
+  if((type === "generation" || type === "gen") && !plan.generationEnabled) return { ok:false, reason:"gen_disabled" };
+  if(type === "rank" && !plan.rankEnabled) return { ok:false, reason:"rank_disabled" };
+  if(type === "global" && !plan.globalEnabled) return { ok:false, reason:"global_disabled" };
+  if(type === "binary" && !plan.binaryEnabled) return { ok:false, reason:"binary_disabled" };
 
   const uRef = doc(db, "users", username);
   const uSnap = await getDoc(uRef);
-  if(!uSnap.exists()) return { ok:false, reason:"User not found" };
+  if(!uSnap.exists()) return { ok:false, reason:"user_not_found" };
 
   const u = uSnap.data();
 
-  // ✅ FINAL RULE: Free ID = 0 income (NO EXCEPTION)
-  const membership = (u.membershipType || "free").toLowerCase();
-  if(membership !== "premium"){
-    return { ok:false, reason:"Free ID blocked" };
+  // 🔒 FINAL RULE: Free ID = NO income (NO EXCEPTION)
+  if(!isPremium(u)){
+    return { ok:false, reason:"free_id_blocked" };
   }
 
-  // cap (earningCap, earningUsed)
-  const deposit = Number(u.depositTotal || 0);
-  const cap = Number(u.earningCap ?? (deposit * plan.earningMultiplier));
-  const used = Number(u.earningUsed || 0);
+  // cap applies to all income types
+  const exclude = (plan.capExcludeTypes || []).map(normType);
+  const useCap = !exclude.includes(type);
 
-  // capExcludeTypes: e.g. ["roi"] → ROI cap-এ গণনা হবে না
-  const exclude = plan.capExcludeTypes.map(normType);
-  const useCap = cap > 0 && !exclude.includes(type);
+  const { cap, used, left } = capInfo(u, plan);
 
   let credit = inc;
   if(useCap){
-    if(used >= cap) return { ok:false, reason:"Cap reached" };
-    credit = Math.min(inc, cap - used);
+    if(cap > 0 && used >= cap) return { ok:false, reason:"cap_reached" };
+    if(cap > 0) credit = Math.min(inc, left);
   }
+  if(credit <= 0) return { ok:false, reason:"no_room" };
 
-  // update user balances + per-type fields
   const upd = {
     earningBalance: increment(credit),
     totalEarning: increment(credit)
   };
-
   if(useCap) upd.earningUsed = increment(credit);
 
-  // per-type counters (optional but useful for dashboard)
   if(type === "sponsor" || type === "direct") upd.directIncome = increment(credit);
   else if(type === "generation" || type === "gen") upd.teamIncome = increment(credit);
   else if(type === "rank") upd.rankIncome = increment(credit);
   else if(type === "global") upd.globalIncome = increment(credit);
   else if(type === "roi") upd.roiEarned = increment(credit);
+  else if(type === "binary") upd.matchingIncome = increment(credit);
 
   await updateDoc(uRef, upd);
 
-  // history log (always)
-  await addDoc(collection(db,"income_history"),{
+  await logHistory({
     username,
-    amount: credit,
     type,
-    remark: remark || "",
-    createdAt: serverTimestamp()
+    amount: credit,
+    remark: remark || ""
   });
 
   return { ok:true, credit };
 }
-// income-engine.js — FINAL VERSION (DO NOT CHANGE LOGIC)
 
-import { db } from "./firebase-config.js";
-import {
-  doc, getDoc, updateDoc,
-  collection, addDoc,
-  serverTimestamp, increment
-} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+/* ==============================
+   ROI DISTRIBUTION (ADMIN RUN)
+================================ */
 
-/* ---------------- CONFIG ---------------- */
+export async function runDailyRoiForAllUsers(){
+  const plan = await getPlan();
+  if(!plan.roiEnabled) return { ok:false, reason:"roi_disabled" };
 
-async function getPlan(){
-  const snap = await getDoc(doc(db,"config","plan"));
-  const p = snap.exists() ? snap.data() : {};
-  return {
-    earningMultiplier: Number(p.earningMultiplier ?? 3),
-    capExcludeTypes: Array.isArray(p.capExcludeTypes) ? p.capExcludeTypes : ["roi"]
-  };
+  const qs = await getDocs(collection(db, "users"));
+  const todayTag = new Date().toISOString().slice(0,10);
+
+  let done = 0, skipped = 0;
+
+  for(const snap of qs.docs){
+    const u = snap.data();
+    const username = snap.id;
+
+    if(!isPremium(u)){ skipped++; continue; }
+    const dep = n(u.depositTotal);
+    if(dep <= 0){ skipped++; continue; }
+
+    const roi = dep * (n(plan.roiPercentPerDay) / 100);
+    if(roi <= 0){ skipped++; continue; }
+
+    const remark = Daily ROI ${plan.roiPercentPerDay}% | Deposit ${dep} | ${todayTag};
+
+    const res = await creditIncome(username, roi, "roi", remark);
+    if(res.ok) done++; else skipped++;
+  }
+
+  return { ok:true, done, skipped, day: todayTag };
 }
 
-/* ---------------- PUBLIC: ENSURE CAP ---------------- */
+/* ==============================
+   BINARY VOLUME BUILDER
+================================ */
 
-export async function ensureEarningCap(username){
-  const ref = doc(db,"users",username);
-  const s = await getDoc(ref);
-  if(!s.exists()) return;
+export async function distributeBinaryVolume(fromUsername, amount){
+  fromUsername = (fromUsername || "").toLowerCase().trim();
+  const vol = n(amount);
+  if(!fromUsername || vol <= 0) return { ok:false, reason:"invalid_input" };
 
-  const u = s.data();
-  const plan = await getPlan();
+  let current = fromUsername;
 
-  const deposit = Number(u.depositTotal || 0);
-  const cap = deposit * plan.earningMultiplier;
+  for(let hop = 0; hop < 200; hop++){
+    const cRef = doc(db, "users", current);
+    const cSnap = await getDoc(cRef);
+    if(!cSnap.exists()) break;
 
-  await updateDoc(ref,{
-    earningCap: cap
-  });
+    const c = cSnap.data();
+    const parent = String(c.placement_parent || "").toLowerCase().trim();
+    const side   = String(c.placement_side || "").toUpperCase().trim(); // L/R
+
+    if(!parent || (side !== "L" && side !== "R")) break;
+
+    const pRef = doc(db, "users", parent);
+    const pSnap = await getDoc(pRef);
+    if(!pSnap.exists()) break;
+
+    await updateDoc(pRef, side === "L"
+      ? { leftVolume: increment(vol) }
+      : { rightVolume: increment(vol) }
+    );
+
+    current = parent;
+  }
+
+  return { ok:true };
 }
 
-/* ---------------- FINAL CREDIT FUNCTION ---------------- */
+/* ==============================
+   BINARY MATCHING (ADMIN RUN)
+================================ */
 
-export async function creditIncome(username, amount, type, remark=""){
-  username = (username || "").toLowerCase();
-  type = (type || "").toLowerCase();
+export async function runBinaryMatching(userSnap, todayTag, matchingPercent = 10){
+  const u = userSnap.data();
+  const username = userSnap.id;
 
-  const inc = Number(amount || 0);
-  if(inc <= 0) return { ok:false, reason:"invalid_amount" };
+  if(!isPremium(u)) return { ok:false, reason:"free_id_blocked" };
 
-  const ref = doc(db,"users",username);
-  const snap = await getDoc(ref);
-  if(!snap.exists()) return { ok:false, reason:"user_not_found" };
+  const dep = n(u.depositTotal);
+  if(dep <= 0) return { ok:false, reason:"no_investment" };
 
-  const u = snap.data();
+  const left  = n(u.leftVolume)  + n(u.carryLeft);
+  const right = n(u.rightVolume) + n(u.carryRight);
 
-  /* 🔒 FINAL RULE: FREE ID = NO INCOME */
-  if((u.membershipType || "free") !== "premium"){
-    return { ok:false, reason:"free_id_blocked" };
+  if(left <= 0 || right <= 0) return { ok:false, reason:"no_pair" };
+
+  const matchVolume = Math.min(left, right);
+  const pct = n(matchingPercent || 10);
+  const gross = matchVolume * (pct / 100);
+  if(gross <= 0) return { ok:false, reason:"gross_zero" };
+
+  const remark = Binary ${pct}% | MatchVol ${matchVolume} | ${todayTag};
+
+  const res = await creditIncome(username, gross, "binary", remark);
+
+  if(!res.ok){
+    return res;
   }
+
+  const newCarryLeft  = left  - matchVolume;
+  const newCarryRight = right - matchVolume;
+
+  await updateDoc(userSnap.ref, {
+    carryLeft: newCarryLeft,
+    carryRight: newCarryRight,
+    lastBinaryRun: todayTag,
+    lastBinaryPercent: pct
+  });
+
+  return { ok:true, credit: res.credit, matchVolume, pct };
+}
+
+export async function runBinaryForAllUsers(percent = null){
+  const plan = await getPlan();
+  if(!plan.binaryEnabled) return { ok:false, reason:"binary_disabled" };
+
+  const pct = (percent === null) ? n(plan.binaryPercent) : n(percent);
+  const todayTag = new Date().toISOString().slice(0,10);
+
+  const qs = await getDocs(collection(db, "users"));
+  let done = 0, skipped = 0;
+
+  for(const snap of qs.docs){
+    const r = await runBinaryMatching(snap, todayTag, pct);
+    if(r.ok) done++; else skipped++;
+  }
+
+  return { ok:true, done, skipped, day: todayTag, percent: pct };
+}
+
+/* ==============================
+   UPGRADE / DEPOSIT HOOK (CALL FROM upgrade.js)
+================================ */
+
+export async function onUserDepositActivate(username, amount, opts = {}){
+  username = (username || "").toLowerCase().trim();
+  const dep = n(amount);
+  const { skipDepositIncrement = false } = opts;
+
+  if(!username || dep <= 0) return { ok:false, reason:"invalid_input" };
 
   const plan = await getPlan();
 
-  const cap = Number(u.earningCap || (u.depositTotal||0) * plan.earningMultiplier);
-  const used = Number(u.earningUsed || 0);
+  const uRef = doc(db, "users", username);
+  const uSnap = await getDoc(uRef);
+  if(!uSnap.exists()) return { ok:false, reason:"user_not_found" };
 
-  const exclude = plan.capExcludeTypes.map(x=>x.toLowerCase());
-  const useCap = cap > 0 && !exclude.includes(type);
+  const u = uSnap.data();
 
-  let credit = inc;
-
-  if(useCap){
-    if(used >= cap) return { ok:false, reason:"cap_reached" };
-    credit = Math.min(inc, cap - used);
+  // depositTotal increase ONLY if not already increased by upgrade.js
+  if(!skipDepositIncrement){
+    await updateDoc(uRef, { depositTotal: increment(dep) });
   }
 
-  /* ---- UPDATE USER ---- */
-  const upd = {
-    earningBalance: increment(credit),
-    totalEarning: increment(credit)
-  };
+  await ensureEarningCap(username);
 
-  if(useCap){
-    upd.earningUsed = increment(credit);
+  // build binary volume uplines (even if uplines are free, volume can build)
+  await distributeBinaryVolume(username, dep);
+
+  // sponsor income (only sponsor if premium — creditIncome will block free sponsor)
+  if(plan.sponsorEnabled && u.sponsor_username){
+    const sp = String(u.sponsor_username).toLowerCase();
+    const spAmt = dep * (n(plan.sponsorPercent)/100);
+
+    const remark = Sponsor ${plan.sponsorPercent}% from ${username} upgrade ${dep};
+    await creditIncome(sp, spAmt, "sponsor", remark);
   }
 
-  if(type==="sponsor") upd.directIncome = increment(credit);
-  if(type==="generation") upd.teamIncome = increment(credit);
-  if(type==="rank") upd.rankIncome = increment(credit);
-  if(type==="global") upd.globalIncome = increment(credit);
-  if(type==="roi") upd.roiEarned = increment(credit);
+  // generation income (creditIncome blocks free uplines)
+  if(plan.generationEnabled){
+    let upline = String(u.sponsor_username || "").toLowerCase();
 
-  await updateDoc(ref, upd);
+    for(const lvl of plan.genLevels){
+      if(!upline) break;
 
-  /* ---- HISTORY (ALWAYS) ---- */
-  await addDoc(collection(db,"income_history"),{
-    username,
-    amount: credit,
-    type,
-    remark,
-    createdAt: serverTimestamp()
-  });
+      const upRef = doc(db, "users", upline);
+      const upSnap = await getDoc(upRef);
+      if(!upSnap.exists()) break;
 
-  return { ok:true, credit };
+      const up = upSnap.data();
+      const directCount = n(up.directCount || up.teamCount || 0);
+
+      if(directCount >= n(lvl.reqDirect)){
+        const gAmt = dep * (n(lvl.percent)/100);
+        const remark = Gen L${lvl.level} ${lvl.percent}% from ${username} upgrade ${dep};
+        await creditIncome(upline, gAmt, "generation", remark);
+      }
+
+      upline = String(up.sponsor_username || "").toLowerCase();
+    }
+  }
+
+  return { ok:true };
 }

@@ -523,3 +523,79 @@ window.goGenealogy     = goGenealogy;
 window.goIncomeHistory = goIncomeHistory;
 window.copyRefLink     = copyRefLink;
 window.copySponsorId   = copySponsorId;
+function setText(id, value){
+  const el = document.getElementById(id);
+  if(el) el.textContent = value;
+}
+function setMoney(id, num){
+  setText(id, fmt(num));
+}
+function setPercentBar(innerId, pct, label){
+  const el = document.getElementById(innerId);
+  if(!el) return;
+  const p = Math.max(0, Math.min(100, Number(pct || 0)));
+  el.style.width = p + "%";
+  el.textContent = (label ? label : (p.toFixed(1) + "%"));
+}
+
+// ✅ call inside initDashboard() AFTER user loaded
+function renderPlanBinaryRank(user){
+  // ===== PLAN =====
+  const planName   = user.planName || user.packageName || user.activePlan || "-";
+  const planAmount = Number(user.planAmount || user.packageAmount || user.activeAmount || 0);
+  const roiPct     = Number(user.roiPercent || user.planRoiPercent || 0);
+
+  const dailyRoi = (planAmount > 0 && roiPct > 0) ? (planAmount * (roiPct/100)) : Number(user.dailyROI || 0);
+  const isActive = (planAmount > 0);
+
+  setText("planName", planName);
+  setMoney("planAmount", planAmount);
+  setText("planRoiPct", roiPct ? (roiPct + "%") : "0%");
+  setMoney("planDailyRoi", dailyRoi);
+  setText("planStatus", isActive ? "Active" : "Inactive");
+
+  const planNote = document.getElementById("planNoteText");
+  if(planNote){
+    planNote.textContent = isActive
+      ? "Plan is active. ROI & incomes should follow your engine rules."
+      : "No active plan. Admin/activation needed.";
+  }
+
+  // ===== BINARY =====
+  const Lm = Number(user.binaryLeftMembers  || user.leftMembers  || 0);
+  const Rm = Number(user.binaryRightMembers || user.rightMembers || 0);
+
+  const Lb = Number(user.binaryLeftBusiness  || user.leftBusiness  || user.leftVolume  || 0);
+  const Rb = Number(user.binaryRightBusiness || user.rightBusiness || user.rightVolume || 0);
+
+  const Lc = Number(user.binaryLeftCarry  || user.leftCarry  || 0);
+  const Rc = Number(user.binaryRightCarry || user.rightCarry || 0);
+
+  const matchIncome = Number(user.matchingIncome || user.binaryMatchingIncome || 0);
+  const todayMatch  = Number(user.todayMatchIncome || user.binaryTodayMatch || 0);
+
+  setText("binLeftMembers", String(Lm));
+  setText("binRightMembers", String(Rm));
+  setMoney("binLeftBusiness", Lb);
+  setMoney("binRightBusiness", Rb);
+  setMoney("binLeftCarry", Lc);
+  setMoney("binRightCarry", Rc);
+  setMoney("binMatchingIncome", matchIncome);
+  setMoney("binTodayMatch", todayMatch);
+
+  // ===== RANK =====
+  const rankName = user.rankName || user.rank || "-";
+  const rankNext = user.nextRank || "-";
+  const target   = Number(user.rankTarget || user.nextRankTarget || 0);
+  const achieved = Number(user.rankAchieved || user.rankVolume || (Lb + Rb) || 0);
+  const rankBonus= Number(user.rankIncome || user.rankBonus || 0);
+
+  setText("rankName", rankName);
+  setText("rankNext", rankNext);
+  setMoney("rankTarget", target);
+  setMoney("rankAchieved", achieved);
+  setMoney("rankBonus", rankBonus);
+
+  const pct = target > 0 ? (achieved/target)*100 : 0;
+  setPercentBar("rankProgressInner", pct, (Math.min(100,pct)).toFixed(1) + "%");
+}

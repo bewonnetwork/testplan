@@ -1,15 +1,14 @@
-// withdraw.js – Firestore ভিত্তিক withdraw request
+// withdraw.js – Firestore ভিত্তিক withdraw request (record create)
 
 import { db } from "./firebase-config.js";
 import {
-  doc,
-  getDoc,
-  addDoc,
-  collection,
+  doc, getDoc,
+  addDoc, collection,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
 const STORAGE_CURRENT = "btx_current_user_v1";
+const $ = (id) => document.getElementById(id);
 
 function getCurrentUser(){
   try{
@@ -26,60 +25,61 @@ async function handleWithdrawSubmit(e){
   const me = getCurrentUser();
   if(!me){
     alert("Please login again.");
-    window.location.href = "login.html";
+    location.href = "login.html";
     return;
   }
-  const username = (me.username || "").toLowerCase();
+
+  const username = String(me.username || "").toLowerCase().trim();
   if(!username){
     alert("Username missing.");
     return;
   }
 
-  const amount  = Number(document.getElementById("wdAmount").value || 0);
-  const method  = document.getElementById("wdMethod").value || "";
-  const address = document.getElementById("wdWallet").value.trim();
+  const amount  = Number(($("wdAmount").value || "").trim() || 0);
+  const method  = String($("wdMethod").value || "").trim();
+  const wallet  = String($("wdWallet").value || "").trim();
 
-  if(!amount || amount < 10){
+  if(!amount || isNaN(amount) || amount < 10){
     alert("Minimum withdraw 10 USDT.");
     return;
   }
-  if(!address){
+  if(!wallet){
     alert("Wallet address দিন।");
     return;
   }
 
-  // 🔥 Firestore থেকে fresh user ডাটা
-  const userRef  = doc(db,"users",username);
+  // ✅ fresh user data
+  const userRef = doc(db, "users", username);
   const userSnap = await getDoc(userRef);
   if(!userSnap.exists()){
     alert("User profile পাওয়া যায়নি।");
     return;
   }
+
   const u = userSnap.data();
   const earning = Number(u.earningBalance || 0);
 
   if(earning < amount){
-    alert("❌ আপনার balance এ পর্যাপ্ত টাকা নেই।");
+    alert("❌ আপনার earning balance এ পর্যাপ্ত টাকা নেই।");
     return;
   }
 
-  // শুধু request তৈরি হবে, টাকা কাটবে admin approve-এর সময়
-  await addDoc(collection(db,"withdraws"),{
+  // ✅ Create withdraw record (pending)
+  await addDoc(collection(db, "withdraws"),{
     username,
     amount,
     method,
-    wallet: address,
+    wallet,
     status: "pending",
     createdAt: serverTimestamp()
   });
 
-  alert("✅ Withdraw request submitted. Please wait for admin approval.");
-  window.location.href = "dashboard.html";
+  alert("✅ Withdraw request submitted (pending). Admin approve করলে paid হবে।");
+  location.href = "dashboard.html";
 }
 
-// INIT
 document.addEventListener("DOMContentLoaded", ()=>{
-  const form = document.getElementById("wdForm");
+  const form = $("wdForm");
   if(!form){
     console.error("wdForm not found");
     return;
